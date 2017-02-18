@@ -49,15 +49,19 @@ public class WandController : MonoBehaviour {
     	ShowTeleportDirection();
     	Teleport();
 
-		if (controller.GetPressDown (triggerButton)) {
-			listOfSpells [currentSpellIndex].RightTriggerDown (controller.GetAxis());
-		}
-		if (controller.GetPress (triggerButton)) {
-			listOfSpells [currentSpellIndex].RightTriggerPress (controller.GetAxis());
-		}
-		if (controller.GetPressUp (triggerButton)) {
-			listOfSpells [currentSpellIndex].RightTriggerUp (controller.GetAxis());
-		}
+		Vector3 normalizedDirection = tipOfWand.position - transform.position;
+		normalizedDirection.Normalize ();
+		listOfSpells[currentSpellIndex].UpdateSpell( 
+			new TriggerState(
+				controller.GetPressUp(triggerButton),
+				controller.GetPressDown(triggerButton),
+				controller.GetPress(triggerButton)
+			),
+			controller.GetAxis(),
+			transform.position,
+			normalizedDirection
+		);
+
 	}
 
   void Teleport() {

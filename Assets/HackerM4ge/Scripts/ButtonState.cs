@@ -1,4 +1,5 @@
 ﻿public class ButtonState {
+	
 	public bool up;
 	public bool down;
 	public bool press;
