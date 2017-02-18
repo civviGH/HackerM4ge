@@ -32,7 +32,6 @@ abstract public class Enemy : MonoBehaviour {
         health -= strength;
     }
    
-    // Use this for initialization
     void Start () {
         ResetSpeed();
         ResetHealth();
@@ -51,5 +50,14 @@ abstract public class Enemy : MonoBehaviour {
     private void ResetHealth()
     {
         health = 80;
+    }
+
+    void OnTriggerEnter(Collider collider)
+    {
+        if (collider.gameObject.CompareTag("EnemyDestination"))
+        {
+            collider.gameObject.GetComponent<AudioSource>().Play();
+            Destroy(gameObject);
+        }
     }
 }

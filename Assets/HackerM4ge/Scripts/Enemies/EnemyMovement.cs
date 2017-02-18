@@ -11,19 +11,22 @@ public class EnemyMovement : MonoBehaviour {
         anim = GetComponent<Animator>();
     }
 
-	// Use this for initialization
-	void Start () {
-        enemy = GameObject.FindGameObjectWithTag("Enemy").GetComponent<Enemy>();
-        GameObject destination = GameObject.FindGameObjectWithTag("EnemyDestination");
-        nav.SetDestination(destination.transform.position);
+    public void SetDestination(Transform transform)
+    {
+        nav.SetDestination(transform.position);
     }
-	
-	// Update is called once per frame
-	void Update () {
-		if (nav.enabled && enemy.GetHealth() <= 0f)
+
+    // Update is called once per frame
+    void Update() {
+        if (nav.enabled && enemy != null && enemy.GetHealth() <= 0f)
         {
-            nav.enabled = false;
             anim.SetTrigger("Dead");
         }
-	}
+        // nav.enabled = false; TODO set this, if Player is dead
+    }
+
+    internal void SetEnemy(Enemy newEnemy)
+    {
+        enemy = newEnemy;
+    }
 }

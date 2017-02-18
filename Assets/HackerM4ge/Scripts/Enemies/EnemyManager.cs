@@ -3,9 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour {
-
-    public GameObject spiderPrefab;
-    public GameObject insectPrefab;
     public float spawnTime = 3f;
     public Transform[] spawners;
     public Transform[] homeNetworks;
@@ -15,51 +12,35 @@ public class EnemyManager : MonoBehaviour {
 	}
 
     void Spawn() {
-        int remainingSpiderCount = 0;
-        int remainingInsectCount = 0;
-        SpawnPoint spawnPoint = null;
+        int remainingCount = 0;
+        SpawnPoint selectedSpawner = null;
 
         foreach(Transform spawner in spawners)
         {
-            remainingSpiderCount += spawner.gameObject.GetComponent<SpawnPoint>().spiderCount;
-            remainingInsectCount += spawner.gameObject.GetComponent<SpawnPoint>().insectCount;
+            remainingCount += spawner.gameObject.GetComponent<SpawnPoint>().GetTotalCount();
         }
         
-        int rand = Random.Range(0, remainingSpiderCount + remainingInsectCount);
-        GameObject prefab;
-        if (rand < remainingSpiderCount)
-        {
-            prefab = spiderPrefab;
-            foreach (Transform spawner in spawners)
-            {
-                spawnPoint = spawner.gameObject.GetComponent<SpawnPoint>();
-                rand -= spawnPoint.spiderCount;
-                if (rand < 0) break;
-            }
-            spawnPoint.spiderCount--;
+        int rand = Random.Range(0, remainingCount);
 
-        } else
+        foreach (Transform spawner in spawners)
         {
-            prefab = insectPrefab;
-            rand -= remainingSpiderCount;
-            foreach (Transform spawner in spawners)
+            rand -= spawner.gameObject.GetComponent<SpawnPoint>().GetTotalCount();
+            if (rand < 0)
             {
-                spawnPoint = spawner.gameObject.GetComponent<SpawnPoint>();
-                rand -= spawnPoint.insectCount;
-                if (rand < 0) break;
+                selectedSpawner = spawner.gameObject.GetComponent<SpawnPoint>();
+                break;
             }
-            spawnPoint.insectCount--;
         }
 
-        int homeNetworkIndex = Random.Range(0, homeNetworks.Length);
+        if (selectedSpawner == null) return;
 
-        if (spawnPoint != null)
-        {
-            Instantiate(prefab, spawnPoint.transform.position, spawnPoint.transform.rotation);
-        }
+        StartCoroutine(waitAndSpwan(selectedSpawner));
     }
-    
-	void Update () {
-		
-	}
+
+    IEnumerator waitAndSpwan(SpawnPoint spawner)
+    {
+        int wait = Random.Range(0, 60);
+        yield return new WaitForSeconds(1f / wait);
+        spawner.SpawnRandom(homeNetworks[Random.Range(0, homeNetworks.Length)]);
+    }
 }
