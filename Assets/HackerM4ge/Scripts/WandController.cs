@@ -33,15 +33,15 @@ public class WandController : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () { 
-    showTeleportDirection();
-    teleport();
+    ShowTeleportDirection();
+    Teleport();
 	}
   // renderer.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
-  void teleport() {
+  void Teleport() {
     if (controller.GetPressUp(touchpad)){
       int direction = GetDirectionOfTouchpad();
       if (direction == up){
-        GameObject nextPlatform = getNextPlatform();
+        GameObject nextPlatform = GetNextPlatform();
         if (nextPlatform != null) {
           CameraComponent cameraComponent = transform.parent.gameObject.GetComponent<CameraComponent>();
           transform.parent.gameObject.transform.position += nextPlatform.transform.position-cameraComponent.currentPlatformTransform.position;
@@ -52,7 +52,7 @@ public class WandController : MonoBehaviour {
     }
   }
   
-  GameObject getNextPlatform() {
+  GameObject GetNextPlatform() {
     RaycastHit hitObject;
     Ray ray = new Ray(transform.position, tipOfWand.position-transform.position);
     if (Physics.Raycast(ray, out hitObject))
@@ -67,7 +67,7 @@ public class WandController : MonoBehaviour {
     return null;
   }
   
-  void showTeleportDirection() {
+  void ShowTeleportDirection() {
     if (controller.GetPressDown(touchpad)){
       int direction = GetDirectionOfTouchpad();
       
