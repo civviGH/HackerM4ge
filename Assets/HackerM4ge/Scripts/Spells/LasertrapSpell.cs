@@ -16,12 +16,12 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     string Spell.GetName()
     {
-        throw new NotImplementedException();
+        return GetType().Name;
     }
 
     Material Spell.GetThumbnail()
     {
-        throw new NotImplementedException();
+        return Resources.Load("LaserBeamHazard", typeof(Material)) as Material;
     }
 
     void Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
