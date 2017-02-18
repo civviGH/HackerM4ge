@@ -5,14 +5,11 @@ public class ChaosSpell : Spell
 {
     private Material material;
 
+    private Camera mainCamera;
     public ChaosSpell ()
     {
-        material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material; 
-    }
-
-    public void Deselect()
-    {
-        throw new NotImplementedException();
+        material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material;
+        mainCamera = Camera.main;
     }
 
     public string GetName ()
@@ -25,14 +22,17 @@ public class ChaosSpell : Spell
         return material;
     }
 
-    public void Select()
-    {
-        throw new NotImplementedException();
-    }
-
     public void UpdateSpell (TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
-        Debug.Log (wandPosition);
+        if (triggerState.down)
+        {
+            Plane[] planes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
+            Bounds wandBounds = new Bounds(wandPosition, new Vector3(1, 1, 1));
+            if (GeometryUtility.TestPlanesAABB(planes, wandBounds))
+            {
+                Debug.Log("Test");
+            }
+        }
     }
 
     // Use this for initialization
@@ -46,4 +46,7 @@ public class ChaosSpell : Spell
     {
 
     }
+
+    public void Select() { }
+    public void Deselect() { }
 }
