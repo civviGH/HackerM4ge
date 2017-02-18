@@ -1,13 +1,18 @@
 ﻿using System;
 using UnityEngine;
 
-public class ChaosSpell : MonoBehaviour, Spell
+public class ChaosSpell : Spell
 {
     private Material material;
 
     public ChaosSpell ()
     {
         material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material; 
+    }
+
+    public void Deselect()
+    {
+        throw new NotImplementedException();
     }
 
     public string GetName ()
@@ -18,6 +23,11 @@ public class ChaosSpell : MonoBehaviour, Spell
     public Material GetThumbnail ()
     {
         return material;
+    }
+
+    public void Select()
+    {
+        throw new NotImplementedException();
     }
 
     public void UpdateSpell (TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
@@ -36,13 +46,4 @@ public class ChaosSpell : MonoBehaviour, Spell
     {
 
     }
-
-    void Select ()
-    {
-    }
-
-    void Deselect ()
-    {
-    }
-	
 }
