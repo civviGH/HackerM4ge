@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EnemeyManager : MonoBehaviour {
+public class EnemyManager : MonoBehaviour {
 
     public GameObject enemyPrefab; // to be spawned
     public float spawnTime = 3f;
