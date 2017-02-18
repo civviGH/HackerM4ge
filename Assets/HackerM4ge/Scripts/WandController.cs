@@ -14,6 +14,7 @@ public class WandController : MonoBehaviour {
   public AudioSource teleportSound;
   
   private GameObject teleportLine;
+  private GameObject highlightedPlatform;
   
 	// buttons
 	private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
@@ -36,7 +37,7 @@ public class WandController : MonoBehaviour {
     ShowTeleportDirection();
     Teleport();
 	}
-  // renderer.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
+
   void Teleport() {
     if (controller.GetPressUp(touchpad)){
       int direction = GetDirectionOfTouchpad();
@@ -91,11 +92,35 @@ public class WandController : MonoBehaviour {
       LineRenderer lineRenderer = teleportLine.GetComponent<LineRenderer>();
       lineRenderer.SetPosition(0, transform.position);
       lineRenderer.SetPosition(1, transform.position + 20*wandDirection);
+      
+      GameObject nextPlatform = GetNextPlatform();
+      if (nextPlatform != null) {
+        highlightPlatform(nextPlatform);
+      } else {
+        unhighlightPlatform();
+      }
     }
     
     if (controller.GetPressUp(touchpad)) {
+      unhighlightPlatform();
       Destroy(teleportLine);
       teleportLine = null;
+    }
+  }
+  
+  void highlightPlatform(GameObject nextPlatform) {
+    unhighlightPlatform();
+    //nextPlatform.GetComponent<Renderer>().material.shader = Shader.Find("Outline_Shader");
+    nextPlatform.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.green*0.5f);
+    //Debug.Log(nextPlatform.GetComponent<Renderer>().material.GetColor("_EmissionColor"));
+    highlightedPlatform = nextPlatform;
+  }
+  
+  void unhighlightPlatform() {
+    if (highlightedPlatform != null) {
+      //highlightedPlatform.GetComponent<Renderer>().material.shader = Shader.Find("Diffuse");
+      highlightedPlatform.GetComponent<Renderer>().material.SetColor("_EmissionColor", Color.black);
+      highlightedPlatform = null;
     }
   }
   
