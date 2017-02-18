@@ -64,7 +64,6 @@ public class MeteorSpell : Spell {
         Random.Range (-15f, 15f)),
       new Quaternion ());
     actualMeteor.GetComponent<MeteorController> ().StartFalling (targetArea);
-    actualMeteor.GetComponent<AudioSource> ().Play ();
   }
 
   public Material GetThumbnail(){

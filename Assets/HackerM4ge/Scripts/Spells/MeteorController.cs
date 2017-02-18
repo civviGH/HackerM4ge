@@ -7,6 +7,7 @@ public class MeteorController : MonoBehaviour {
   private Vector3 direction;
 
   public GameObject explosionSoundObject;
+  public GameObject fireSoundObject;
 
   public MeteorController(){
   }
@@ -28,9 +29,17 @@ public class MeteorController : MonoBehaviour {
 
   void OnTriggerEnter(Collider hitObject){
     if (hitObject.GetComponent<Collider> ().gameObject.layer == LayerMask.NameToLayer ("Surfaces")) {
+      // fade out fire sound
+      fireSoundObject.transform.parent = null;
+            fireSoundObject.GetComponent<FireSoundObjectScript> ().FadeOut ();
+
+      // explosionsound
       explosionSoundObject.transform.parent = null;
       explosionSoundObject.GetComponent<AudioSource> ().Play ();
-      Destroy (explosionSoundObject, 3f);
+
+      // destroy objects
+      Destroy (fireSoundObject, 1.5f);
+      Destroy (explosionSoundObject, 2f);
       Destroy (gameObject);
     }
   }
