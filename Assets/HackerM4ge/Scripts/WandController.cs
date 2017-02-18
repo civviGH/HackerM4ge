@@ -43,6 +43,7 @@ public class WandController : MonoBehaviour
     // Add spells to spellList
     listOfSpells.Add (new MeteorSpell ());
     listOfSpells.Add (new LasertrapSpell ());
+    listOfSpells.Add (new ChaosSpell());
 
     // Put material of spell on thumbnailpanel
     UpdateThumbnail();
