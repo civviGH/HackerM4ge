@@ -33,7 +33,6 @@ public class WandController : MonoBehaviour {
 	List<Spell> listOfSpells = new List<Spell>();
 	private int currentSpellIndex = 0;
 
-
 	// Use this for initialization
 	void Start () {
     	trackedObj = GetComponent<SteamVR_TrackedObject>();
