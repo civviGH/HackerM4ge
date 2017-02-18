@@ -36,30 +36,35 @@ public class WandController : MonoBehaviour {
     showTeleportDirection();
     teleport();
 	}
-  
+  // renderer.material.shader = Shader.Find("Self-Illumin/Outlined Diffuse");
   void teleport() {
     if (controller.GetPressUp(touchpad)){
       int direction = GetDirectionOfTouchpad();
       if (direction == up){
-        RaycastHit hitObject;
-        //Debug.Log(transform.position + " | " + (tipOfWand.position-transform.position));
-        Ray ray = new Ray(transform.position, tipOfWand.position-transform.position);
-        if (Physics.Raycast(ray, out hitObject))
-        {
-          //Debug.Log(hitObject);
-          if (hitObject.transform.parent != null){
-            GameObject parent = hitObject.transform.parent.gameObject;          
-            if (hitObject.collider.isTrigger && (parent.GetComponent("PlatformComponent") as PlatformComponent) != null){
-              CameraComponent cameraComponent = transform.parent.gameObject.GetComponent("CameraComponent") as CameraComponent;
-              transform.parent.gameObject.transform.position += parent.transform.position-cameraComponent.currentPlatformTransform.position;
-              cameraComponent.currentPlatformTransform = parent.transform;
-              //Debug.Log("BAZINGA");
-              teleportSound.Play();
-            }
-          }
+        GameObject nextPlatform = getNextPlatform();
+        if (nextPlatform != null) {
+          CameraComponent cameraComponent = transform.parent.gameObject.GetComponent<CameraComponent>();
+          transform.parent.gameObject.transform.position += nextPlatform.transform.position-cameraComponent.currentPlatformTransform.position;
+          cameraComponent.currentPlatformTransform = nextPlatform.transform;
+          teleportSound.Play();
         }
       }
     }
+  }
+  
+  GameObject getNextPlatform() {
+    RaycastHit hitObject;
+    Ray ray = new Ray(transform.position, tipOfWand.position-transform.position);
+    if (Physics.Raycast(ray, out hitObject))
+    {
+      if (hitObject.transform.parent != null){
+        GameObject nextPlatform = hitObject.transform.parent.gameObject;          
+        if (hitObject.collider.isTrigger && nextPlatform.GetComponent<PlatformComponent>() != null){
+          return nextPlatform;
+        }
+      }
+    }
+    return null;
   }
   
   void showTeleportDirection() {
