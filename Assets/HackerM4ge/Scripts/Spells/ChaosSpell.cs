@@ -1,40 +1,48 @@
 ﻿using System;
 using UnityEngine;
 
-public class ChaosSpell : MonoBehaviour, Spell {
+public class ChaosSpell : MonoBehaviour, Spell
+{
     private Material material;
 
-    public ChaosSpell()
+    public ChaosSpell ()
     {
-        material = Resources.Load("ChaosSpellThumbnailMaterial", typeof(Material)) as Material; 
+        material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material; 
     }
 
-    public string GetName()
+    public string GetName ()
     {
         return "Chaos";
     }
 
-    public Material GetThumbnail()
+    public Material GetThumbnail ()
     {
         return material;
     }
 
-    public void UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
+    public void UpdateSpell (TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
-        Debug.Log(wandPosition);
+        Debug.Log (wandPosition);
     }
 
     // Use this for initialization
-    void Start () {
+    void Start ()
+    {
 		
-	}
+    }
 	
-	// Update is called once per frame
-	void Update () {
+    // Update is called once per frame
+    void Update ()
+    {
 
     }
 
-    void Select() { }
+    void Select ()
+    {
+    }
 
-    void Deselect() { }
+    void Deselect ()
+    {
+    }
+	
 }
