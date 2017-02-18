@@ -14,7 +14,7 @@ public class MeteorSpell : Spell {
 		this.Thumbnail = Resources.Load ("MeteorThumbnailMaterial") as Material;
 		this.previewSpherePrefab = Resources.Load ("MeteorSpellPrefabs/MeteorPreviewPrefab") as GameObject;
 		this.raycastLayerMask = LayerMask.GetMask ("Surfaces");
-		this.meteorPrefab = Resources.Load ("MeteorSpellPrefabs/Meteor") as GameObject;
+		this.meteorPrefab = Resources.Load ("MeteorSpellPrefabs/Meteor2") as GameObject;
 	}
 
 	public void UpdateSpell(
@@ -63,6 +63,7 @@ public class MeteorSpell : Spell {
 				                          Random.Range (-5f, 5f)),
 			                          new Quaternion ());
 		actualMeteor.GetComponent<MeteorController> ().StartFalling (targetArea, 20f);
+		actualMeteor.GetComponent<AudioSource> ().Play ();
 	}
 	
 	public Material GetThumbnail(){
