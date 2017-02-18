@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 class LasertrapSpell : MonoBehaviour, Spell
 {
@@ -6,23 +7,20 @@ class LasertrapSpell : MonoBehaviour, Spell
     private Material laserBeamHazardMaterial;
 
     private GameObject trapSource;
-    private float trapSourceDistance;
     private GameObject trapTarget;
-    private float trapTargetDistance;
+    private float trapSourceDistance;
 
     public LasertrapSpell()
     {
         laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
         laserBeamHazardMaterial = Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
-        Reset();
     }
 
-    private void Reset()
+    private void Init()
     {
         trapSource = Instantiate(laserSourcePrefab) as GameObject;
         trapTarget = null;
         trapSourceDistance = 0.2f;
-        trapTargetDistance = 0.2f;
     }
 
     string Spell.GetName()
@@ -57,7 +55,7 @@ class LasertrapSpell : MonoBehaviour, Spell
             Destroy(trapTarget, 5f);
             Destroy(laser, 5f);
 
-            Reset();
+            Init();
         }
     }
 
@@ -87,5 +85,18 @@ class LasertrapSpell : MonoBehaviour, Spell
         line.GetComponent<LineRenderer>().material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 
         return line;
+    }
+
+    void Spell.Select()
+    {
+        Init();
+    }
+
+    void Spell.Deselect()
+    {
+        Destroy(trapSource);
+        Destroy(trapTarget);
+        trapSource = null;
+        trapTarget = null;
     }
 }

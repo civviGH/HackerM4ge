@@ -1,5 +1,5 @@
 ﻿using UnityEngine;
-using System.Collections;
+using System;
 
 public class MeteorSpell : Spell {
 
@@ -17,7 +17,7 @@ public class MeteorSpell : Spell {
     this.meteorPrefab = Resources.Load ("MeteorSpellPrefabs/Meteor2") as GameObject;
   }
 
-  public void UpdateSpell(
+  void Spell.UpdateSpell(
     TriggerState triggerState, 
     Vector2 touchpadAxis, 
     Vector3 wandPosition,
@@ -66,11 +66,11 @@ public class MeteorSpell : Spell {
     actualMeteor.GetComponent<MeteorController> ().StartFalling (targetArea);
   }
 
-  public Material GetThumbnail(){
+  Material Spell.GetThumbnail(){
     return this.Thumbnail;
   }
 
-  public string GetName(){
+  string Spell.GetName(){
     return "Meteor";
   }
 
@@ -78,4 +78,8 @@ public class MeteorSpell : Spell {
   void Update () {
     
   }
+
+  void Spell.Select() { }
+
+  void Spell.Deselect() { }
 }
