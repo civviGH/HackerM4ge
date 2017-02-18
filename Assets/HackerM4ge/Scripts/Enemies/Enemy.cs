@@ -1,9 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
 
 abstract public class Enemy : MonoBehaviour {
     private float health;
+
+    internal float GetHealth()
+    {
+        return health; // TODO use short syntax instead
+    }
+
     private float speed;
 
     public enum DamageType { Fire, Water, Earth, Wind, Physical, Electricity, Love};
@@ -11,6 +16,7 @@ abstract public class Enemy : MonoBehaviour {
     public void Knockback(float strength) {
         // TODO
     }
+
     public void SlowDown(float strength, float duration)
     {
         speed *= strength;
