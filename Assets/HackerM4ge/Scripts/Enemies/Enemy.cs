@@ -4,6 +4,10 @@ using UnityEngine;
 abstract public class Enemy : MonoBehaviour {
     private float health;
 
+    public Enemy() {
+        ResetHealth();
+    }
+
     internal float GetHealth()
     {
         return health; // TODO use short syntax instead

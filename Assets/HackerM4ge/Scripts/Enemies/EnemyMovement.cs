@@ -4,9 +4,11 @@ using UnityEngine.AI;
 public class EnemyMovement : MonoBehaviour {
     Enemy enemy;
     NavMeshAgent nav;
+    Animator anim;
 
     void Awake() {
-        nav = GetComponent<NavMeshAgent> ();
+        nav = GetComponent<NavMeshAgent>();
+        anim = GetComponent<Animator>();
     }
 
 	// Use this for initialization
@@ -18,9 +20,10 @@ public class EnemyMovement : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		if (enemy.GetHealth() <= 0f)
+		if (nav.enabled && enemy.GetHealth() <= 0f)
         {
             nav.enabled = false;
+            anim.SetTrigger("Dead");
         }
 	}
 }
