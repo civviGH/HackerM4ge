@@ -55,7 +55,6 @@ public class EnemyManager : MonoBehaviour {
 
         if (spawnPoint != null)
         {
-            prefab
             Instantiate(prefab, spawnPoint.transform.position, spawnPoint.transform.rotation);
         }
     }
