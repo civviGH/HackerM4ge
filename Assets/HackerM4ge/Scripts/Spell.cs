@@ -4,7 +4,7 @@ public interface Spell {
 
 	Material GetThumbnail ();
 	string GetName();
-	void ButtonUp();
-	void ButtonDown();
-	void ButtonPress();
+	void RightTriggerUp(Vector2 touchpadAxis);
+	void RightTriggerDown(Vector2 touchpadAxis);
+	void RightTriggerPress(Vector2 touchpadAxis);
 }

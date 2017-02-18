@@ -13,6 +13,8 @@ public class WandController : MonoBehaviour {
   public Transform tipOfWand;
   
   public AudioSource teleportSound;
+
+	public GameObject thumbnailPanel;
   
   private GameObject teleportLine;
   private GameObject highlightedPlatform;
@@ -29,17 +31,34 @@ public class WandController : MonoBehaviour {
   
     // List of spells
 	List<Spell> listOfSpells = new List<Spell>();
+	private int currentSpellIndex = 0;
 
 
 	// Use this for initialization
 	void Start () {
-    trackedObj = GetComponent<SteamVR_TrackedObject>();
+    	trackedObj = GetComponent<SteamVR_TrackedObject>();
+
+		// Add spells to spellList
+		listOfSpells.Add (new MeteorSpell());
+
+		// Put material of spell on thumbnailpanel
+		thumbnailPanel.GetComponent<Renderer>().material = listOfSpells[currentSpellIndex].GetThumbnail();
 	}
 	
 	// Update is called once per frame
 	void Update () { 
-    ShowTeleportDirection();
-    Teleport();
+    	ShowTeleportDirection();
+    	Teleport();
+
+		if (controller.GetPressDown (triggerButton)) {
+			listOfSpells [currentSpellIndex].RightTriggerDown (controller.GetAxis());
+		}
+		if (controller.GetPress (triggerButton)) {
+			listOfSpells [currentSpellIndex].RightTriggerPress (controller.GetAxis());
+		}
+		if (controller.GetPressUp (triggerButton)) {
+			listOfSpells [currentSpellIndex].RightTriggerUp (controller.GetAxis());
+		}
 	}
 
   void Teleport() {
