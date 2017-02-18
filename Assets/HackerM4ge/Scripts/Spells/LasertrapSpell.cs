@@ -11,7 +11,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     public LasertrapSpell()
     {
-        trapSource = Instantiate(Resources.Load("LaserSource")) as GameObject;
+        trapSource = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
     }
 
     string Spell.GetName()
@@ -21,7 +21,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     Material Spell.GetThumbnail()
     {
-        return Resources.Load("LaserBeamHazard", typeof(Material)) as Material;
+        return Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
     }
 
     void Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
@@ -37,7 +37,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 
         if (triggerState.up && trapTarget == null)
         {
-            trapTarget = Instantiate(Resources.Load("LaserSource")) as GameObject;
+            trapTarget = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
         }
         else if (triggerState.up && trapTarget != null)
         {
@@ -47,7 +47,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void UpdateTrapSource(ref GameObject trapSource, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
-        float distance = touchpadAxis.y * Time.deltaTime;
+        float distance = touchpadAxis.y * Time.deltaTime * 5;
         trapSourceDistance += distance;
         UpdateTrapSourcePosition(ref trapSource, trapSourceDistance, wandPosition, wandDirection);
     }
@@ -61,7 +61,7 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         GameObject line = new GameObject();
         line.AddComponent<LineRenderer>();
-        line.GetComponent<LineRenderer>().numPositions = 1;
+        line.GetComponent<LineRenderer>().numPositions = 2;
         line.GetComponent<LineRenderer>().SetPosition(0, from);
         line.GetComponent<LineRenderer>().SetPosition(1, to);
         line.GetComponent<LineRenderer>().startWidth = 0.1f;

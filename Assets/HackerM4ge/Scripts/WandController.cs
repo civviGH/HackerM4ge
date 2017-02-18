@@ -42,14 +42,16 @@ public class WandController : MonoBehaviour
 
     // Add spells to spellList
     listOfSpells.Add (new MeteorSpell ());
+    listOfSpells.Add (new LasertrapSpell ());
 
     // Put material of spell on thumbnailpanel
-    thumbnailPanel.GetComponent<Renderer> ().material = listOfSpells [currentSpellIndex].GetThumbnail ();
+    UpdateThumbnail();
   }
 	
   // Update is called once per frame
   void Update ()
   { 
+    SpellSelect ();
     ShowTeleportDirection ();
     Teleport ();
 
@@ -65,6 +67,32 @@ public class WandController : MonoBehaviour
       transform.position,
       normalizedDirection
     );
+  }
+
+  void SpellSelect ()
+  {
+    if (controller.GetPressDown (touchpad)) {
+      int direction = GetDirectionOfTouchpad ();
+      if (direction == left) {
+        currentSpellIndex -= 1;
+        if (currentSpellIndex < 0) {
+          currentSpellIndex = listOfSpells.Count - 1;
+        }
+        return;
+      }
+      if (direction == right) {
+        currentSpellIndex += 1;
+        if (currentSpellIndex >= listOfSpells.Count) {
+          currentSpellIndex = 0;
+        }
+      }
+      UpdateThumbnail ();
+    }
+  }
+
+  void UpdateThumbnail ()
+  {
+    thumbnailPanel.GetComponent<Renderer> ().material = listOfSpells [currentSpellIndex].GetThumbnail ();
   }
 
   void Teleport ()
