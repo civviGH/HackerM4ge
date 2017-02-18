@@ -31,6 +31,10 @@ public class ChaosSpell : MonoBehaviour, Spell {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
+
+    }
+
+    void Select() { }
+
+    void Deselect() { }
 }
