@@ -3,15 +3,27 @@ using UnityEngine;
 
 class LasertrapSpell : MonoBehaviour, Spell
 {
+    private UnityEngine.Object laserSourcePrefab;
+    private Material laserBeamHazardMaterial;
+
     private GameObject trapSource;
-    private float trapSourceDistance = 0f;
+    private float trapSourceDistance;
     private GameObject trapTarget;
-    private float trapTargetDistance = 0f;
-    private GameObject laser;
+    private float trapTargetDistance;
 
     public LasertrapSpell()
     {
-        trapSource = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
+        laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
+        laserBeamHazardMaterial = Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
+        Reset();
+    }
+
+    private void Reset()
+    {
+        trapSource = Instantiate(laserSourcePrefab) as GameObject;
+        trapTarget = null;
+        trapSourceDistance = 0.2f;
+        trapTargetDistance = 0.2f;
     }
 
     string Spell.GetName()
@@ -21,7 +33,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     Material Spell.GetThumbnail()
     {
-        return Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
+        return laserBeamHazardMaterial;
     }
 
     void Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
@@ -41,7 +53,12 @@ class LasertrapSpell : MonoBehaviour, Spell
         }
         else if (triggerState.up && trapTarget != null)
         {
-            laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
+            GameObject laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
+            Destroy(trapSource, 5f);
+            Destroy(trapTarget, 5f);
+            Destroy(laser, 5f);
+
+            Reset();
         }
     }
 
@@ -64,8 +81,8 @@ class LasertrapSpell : MonoBehaviour, Spell
         line.GetComponent<LineRenderer>().numPositions = 2;
         line.GetComponent<LineRenderer>().SetPosition(0, from);
         line.GetComponent<LineRenderer>().SetPosition(1, to);
-        line.GetComponent<LineRenderer>().startWidth = 0.1f;
-        line.GetComponent<LineRenderer>().endWidth = 0.1f;
+        line.GetComponent<LineRenderer>().startWidth = 0.01f;
+        line.GetComponent<LineRenderer>().endWidth = 0.01f;
         line.GetComponent<LineRenderer>().startColor = Color.red;
         line.GetComponent<LineRenderer>().endColor = Color.red;
         line.GetComponent<LineRenderer>().material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
