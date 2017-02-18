@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Collections.Generic;
 
 public class WandController : MonoBehaviour {
 
@@ -26,7 +27,10 @@ public class WandController : MonoBehaviour {
 	private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index);}}
 	private SteamVR_TrackedObject trackedObj;
   
-  
+    // List of spells
+	List<Spell> listOfSpells = new List<Spell>();
+
+
 	// Use this for initialization
 	void Start () {
     trackedObj = GetComponent<SteamVR_TrackedObject>();
