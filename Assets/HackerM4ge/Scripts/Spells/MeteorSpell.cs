@@ -58,11 +58,11 @@ public class MeteorSpell : Spell {
 		// instantiate meteor
 		GameObject actualMeteor = GameObject.Instantiate (
 			                          this.meteorPrefab, targetArea + new Vector3 (
-				                          Random.Range (-5f, 5f),
+				                          Random.Range (-15f, 15f),
 				                          20,
-				                          Random.Range (-5f, 5f)),
+				                          Random.Range (-15f, 15f)),
 			                          new Quaternion ());
-		actualMeteor.GetComponent<MeteorController> ().StartFalling (targetArea, 20f);
+		actualMeteor.GetComponent<MeteorController> ().StartFalling (targetArea);
 		actualMeteor.GetComponent<AudioSource> ().Play ();
 	}
 	
