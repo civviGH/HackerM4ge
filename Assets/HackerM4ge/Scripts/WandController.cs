@@ -11,7 +11,9 @@ public class WandController : MonoBehaviour {
 
   public Transform tipOfWand;
   
-  public GameObject teleportLine;
+  public AudioSource teleportSound;
+  
+  private GameObject teleportLine;
   
 	// buttons
 	private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
@@ -52,6 +54,7 @@ public class WandController : MonoBehaviour {
               transform.parent.gameObject.transform.position += parent.transform.position-cameraComponent.currentPlatformTransform.position;
               cameraComponent.currentPlatformTransform = parent.transform;
               //Debug.Log("BAZINGA");
+              teleportSound.Play();
             }
           }
         }
