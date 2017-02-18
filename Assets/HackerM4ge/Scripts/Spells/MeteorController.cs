@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class MeteorController : MonoBehaviour {
 
-  //private Vector3 startPosition;
-  //private Vector3 targetPosition;
   private Vector3 direction;
 
   public GameObject explosionSoundObject;
@@ -17,16 +15,10 @@ public class MeteorController : MonoBehaviour {
     this.direction = targetPosition - this.transform.position;
     this.direction.Normalize();
     gameObject.GetComponent<Rigidbody> ().velocity = this.direction * 25f;
-    Debug.Log (this.direction * 10f);
-    Debug.Log (gameObject);
   }
 
   // Use this for initialization
   void Start () {
-    /*this.startTime = Time.time;
-    this.startPosition = this.transform.position;
-    this.wayToTravel = Vector3.Distance (this.transform.position, this.targetPosition);
-*/
   }
 
   // Update is called once per frame
@@ -34,10 +26,12 @@ public class MeteorController : MonoBehaviour {
     
   }
 
-  void OnTriggerEnter(){
-    explosionSoundObject.transform.parent = null;
-    explosionSoundObject.GetComponent<AudioSource> ().Play ();
-    Destroy(explosionSoundObject, 3f);
-    Destroy (gameObject, 0.1f);
+  void OnTriggerEnter(Collider hitObject){
+    if (hitObject.GetComponent<Collider> ().gameObject.layer == LayerMask.NameToLayer ("Surfaces")) {
+      explosionSoundObject.transform.parent = null;
+      explosionSoundObject.GetComponent<AudioSource> ().Play ();
+      Destroy (explosionSoundObject, 3f);
+      Destroy (gameObject);
+    }
   }
 }
