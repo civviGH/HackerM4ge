@@ -1,8 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-public class ChaosSpell : Spell
-{
+public class ChaosSpell : Spell { 
     private GameObject potionPrefab;
     private Material material;
     private Camera mainCamera;
@@ -66,20 +65,8 @@ public class ChaosSpell : Spell
                 sum += lastPositions[i];
             }
             sum /= Length; // TODO division by zero
-            potion.gameObject.GetComponent<Rigidbody>().velocity = wandPosition - sum;
+            potion.gameObject.GetComponent<Rigidbody>().velocity = (wandPosition - sum) * 10f;
         }
-    }
-
-    // Use this for initialization
-    void Start ()
-    {
-		
-    }
-	
-    // Update is called once per frame
-    void Update ()
-    {
-
     }
 
     public void Select() { }
