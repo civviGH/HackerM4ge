@@ -18,12 +18,12 @@ public class LaserRay : MonoBehaviour
         {
             return;
         }
-        RaycastHit hitObject;
         Ray ray = new Ray(from, to-from);
         float maxDistance = (to - from).magnitude;
-        if (Physics.Raycast(ray, out hitObject, maxDistance, damagableLayer))
+        RaycastHit[] hits = Physics.RaycastAll(ray, maxDistance, damagableLayer);
+        foreach (RaycastHit hit in hits)
         {
-            Enemy enemy = hitObject.collider.transform.gameObject.GetComponent<Enemy>();
+            Enemy enemy = hit.collider.transform.gameObject.GetComponent<Enemy>();
             enemy.damage(Time.deltaTime * dps, Enemy.DamageType.Light);
         }
     }
