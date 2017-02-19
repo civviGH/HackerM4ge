@@ -7,12 +7,10 @@ public class PressSpaceBar : MonoBehaviour {
     private Material skyboxMaterial;
     public Camera playerCam;
 
+
     // Use this for initialization
     void Start () {
         this.skyboxMaterial = gameObject.GetComponent<Skybox> ().material;
-
-        // testpoints for bezier
-
     }
 
 	// Update is called once per frame
