@@ -2,27 +2,40 @@
 using UnityEngine.AI;
 
 public class EnemyMovement : MonoBehaviour {
-    Enemy enemy;
-    NavMeshAgent nav;
-    Animator anim;
+    private Enemy enemy;
+    private NavMeshAgent nav;
+    private Animator anim;
+    private Transform[] transforms;
+    private int transformIndex;
 
     void Awake() {
         nav = GetComponent<NavMeshAgent>();
         anim = GetComponent<Animator>();
     }
 
-    public void SetDestination(Transform transform)
+    public void SetDestinations(Transform[] transforms)
     {
-        nav.SetDestination(transform.position);
+        this.transformIndex = 0;
+        this.transforms = transforms;
     }
 
     // Update is called once per frame
     void Update() {
+        while ((transformIndex < transforms.Length) && (transforms[transformIndex] == null))
+        {
+            transformIndex++;
+        }
+        if (transformIndex >= transforms.Length)
+        {
+            nav.enabled = false;
+            return;
+        }
+        nav.SetDestination(transforms[transformIndex].position);
+
         if (nav.enabled && enemy != null && enemy.GetHealth() <= 0f)
         {
             anim.SetTrigger("Dead");
         }
-        // nav.enabled = false; TODO set this, if Player is dead
     }
 
     internal void SetEnemy(Enemy newEnemy)

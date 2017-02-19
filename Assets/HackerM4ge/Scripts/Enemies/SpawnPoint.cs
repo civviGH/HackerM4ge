@@ -13,7 +13,7 @@ public class SpawnPoint : MonoBehaviour {
         return spiderCount + virusCount;
     }
 
-    public void SpawnRandom(Transform destination)
+    public void SpawnRandom(Transform[] destinations)
     {
         int rand = Random.Range(0, virusCount + spiderCount);
         GameObject newEnemy;
@@ -28,7 +28,7 @@ public class SpawnPoint : MonoBehaviour {
             spiderCount--;
         }
         EnemyMovement enemyMovement = newEnemy.GetComponent<EnemyMovement>();
-        enemyMovement.SetDestination(destination);
+        enemyMovement.SetDestinations(destinations);
         enemyMovement.SetEnemy(newEnemy.gameObject.GetComponent<Enemy>());
     }
 }

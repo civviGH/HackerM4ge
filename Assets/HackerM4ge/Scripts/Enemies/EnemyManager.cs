@@ -37,10 +37,28 @@ public class EnemyManager : MonoBehaviour {
         StartCoroutine(waitAndSpwan(selectedSpawner));
     }
 
+    Transform[] CloneAndShuffleHomeNetworks()
+    {
+        Transform[] ret = new Transform[homeNetworks.Length];
+        for (int i = 0; i < homeNetworks.Length; i++)
+        {
+            ret[i] = homeNetworks[i];
+        }
+        for (int i = homeNetworks.Length - 1; i > 0; i--)
+        {
+            int rand = Random.Range(0, i + 1);
+            Transform tmp = ret[i];
+            ret[i] = ret[rand];
+            ret[rand] = tmp;
+        }
+        return ret;
+    }
+
     IEnumerator waitAndSpwan(SpawnPoint spawner)
     {
         int wait = Random.Range(0, 60);
         yield return new WaitForSeconds(1f / wait);
-        spawner.SpawnRandom(homeNetworks[Random.Range(0, homeNetworks.Length)]);
+        
+        spawner.SpawnRandom(CloneAndShuffleHomeNetworks());
     }
 }
