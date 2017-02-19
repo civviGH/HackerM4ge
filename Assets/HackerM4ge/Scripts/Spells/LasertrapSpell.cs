@@ -4,6 +4,7 @@ using UnityEngine;
 class LasertrapSpell : MonoBehaviour, Spell
 {
     const float minimalDistance = 0.2f;
+    const float maxSpeed = 20f;
 
     private UnityEngine.Object laserSourcePrefab;
     private Material laserBeamHazardMaterial;
@@ -66,7 +67,8 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void UpdateTrapSource(ref GameObject trapSource, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
-        float distance = touchpadAxis.y * Time.deltaTime * 5;
+        Debug.Log("touchpadAxis.y = " + touchpadAxis.y);
+        float distance = touchpadAxis.y * touchpadAxis.y * Time.deltaTime * maxSpeed;
         trapSourceDistance += distance;
         if(trapSourceDistance < minimalDistance)
         {
