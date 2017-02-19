@@ -1,4 +1,4 @@
-﻿public class Spider : Enemy { 
+public class Spider : Enemy { 
     public Spider(){
         networkDamage = 5;
     }
