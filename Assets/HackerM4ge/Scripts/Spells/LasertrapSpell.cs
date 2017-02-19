@@ -3,8 +3,11 @@ using UnityEngine;
 
 class LasertrapSpell : MonoBehaviour, Spell
 {
+    const float minimalDistance = 0.2f;
+
     private UnityEngine.Object laserSourcePrefab;
     private Material laserBeamHazardMaterial;
+    private LayerMask surfaceLayer;
 
     private GameObject trapSource;
     private GameObject trapTarget;
@@ -14,13 +17,15 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
         laserBeamHazardMaterial = Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
+        surfaceLayer = LayerMask.GetMask("Surface");
+
+        trapSourceDistance = minimalDistance;
     }
 
     private void Init()
     {
         trapSource = Instantiate(laserSourcePrefab) as GameObject;
         trapTarget = null;
-        trapSourceDistance = 0.2f;
     }
 
     string Spell.GetName()
@@ -63,12 +68,25 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         float distance = touchpadAxis.y * Time.deltaTime * 5;
         trapSourceDistance += distance;
+        if(trapSourceDistance < minimalDistance)
+        {
+            trapSourceDistance = minimalDistance;
+        }
         UpdateTrapSourcePosition(ref trapSource, trapSourceDistance, wandPosition, wandDirection);
     }
 
     private void UpdateTrapSourcePosition(ref GameObject trapSource, float trapSourceDistance, Vector3 wandPosition, Vector3 wandDirection)
     {
-        trapSource.transform.position = wandPosition + wandDirection * trapSourceDistance;
+        RaycastHit hitObject;
+        Ray ray = new Ray(wandPosition, wandDirection);
+
+        float currentDistance = trapSourceDistance;
+        if (Physics.Raycast(ray, out hitObject, trapSourceDistance, surfaceLayer))
+        {
+            currentDistance = Math.Max(hitObject.distance - 0.5f, minimalDistance);
+        }
+
+        trapSource.transform.position = wandPosition + wandDirection * currentDistance;
     }
 
     private static GameObject CreateLaser(Vector3 from, Vector3 to)
