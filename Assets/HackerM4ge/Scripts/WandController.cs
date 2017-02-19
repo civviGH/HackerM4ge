@@ -50,7 +50,6 @@ public class WandController : MonoBehaviour
             vibrate => { controller.TriggerHapticPulse(vibrate.microseconds); return Unit.Instance; }
         );
 
-
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();
     }
@@ -93,9 +92,14 @@ public class WandController : MonoBehaviour
             if (newSpellIndex != currentSpellIndex)
             {
                 listOfSpells[currentSpellIndex].Deselect();
-                listOfSpells[newSpellIndex].Select();
+                Union2<WandAction.Drain, WandAction.Vibrate> wandAction = listOfSpells[newSpellIndex].Select();
                 currentSpellIndex = newSpellIndex;
                 UpdateThumbnail();
+
+                wandAction.Match<Unit>(
+                    drain => { return Unit.Instance; },
+                    vibrate => { controller.TriggerHapticPulse(vibrate.microseconds); return Unit.Instance; }
+                );
             }
         }
     }
