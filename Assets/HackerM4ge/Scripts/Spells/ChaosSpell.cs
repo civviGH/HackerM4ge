@@ -61,7 +61,13 @@ public class ChaosSpell : Spell {
             }
             sum /= Length; // TODO division by zero
             */
-            potion.gameObject.GetComponent<Rigidbody>().velocity = (wandPosition - lastPosition) * 10f;
+            Rigidbody potionRigibody = potion.gameObject.GetComponent<Rigidbody> ();
+            potionRigibody.velocity = Time.deltaTime * (wandPosition - lastPosition) * 18000f;
+            float torqueMultiplier = 100f;
+            potionRigibody.AddTorque (
+                UnityEngine.Random.Range (-torqueMultiplier, torqueMultiplier), 
+                UnityEngine.Random.Range (-torqueMultiplier, torqueMultiplier), 
+                UnityEngine.Random.Range (-torqueMultiplier, torqueMultiplier) * 100f );
         }
     }
 
