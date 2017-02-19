@@ -5,6 +5,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 {
     const float minimalDistance = 0.2f;
     const float maxSpeed = 15f;
+    const float lifetime = 20f;
 
     private UnityEngine.Object laserSourcePrefab;
     private Material laserBeamHazardMaterial;
@@ -57,9 +58,9 @@ class LasertrapSpell : MonoBehaviour, Spell
         else if (triggerState.up && trapTarget != null)
         {
             GameObject laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
-            Destroy(trapSource, 5f);
-            Destroy(trapTarget, 5f);
-            Destroy(laser, 5f);
+            Destroy(trapSource, lifetime);
+            Destroy(trapTarget, lifetime);
+            Destroy(laser, lifetime);
 
             Init();
         }
