@@ -1,6 +1,8 @@
 using System;
 using UnityEngine;
 
+using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
+
 class LasertrapSpell : MonoBehaviour, Spell
 {
     const float minimalDistance = 0.2f;
@@ -40,7 +42,7 @@ class LasertrapSpell : MonoBehaviour, Spell
         return laserBeamHazardMaterial;
     }
 
-    void Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
+    TWandAction[] Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
         if (triggerState.press && trapTarget == null)
         {
@@ -64,6 +66,9 @@ class LasertrapSpell : MonoBehaviour, Spell
 
             Init();
         }
+
+        TWandAction[] actions = { };
+        return actions;
     }
 
     private void UpdateTrapSource(ref GameObject trapSource, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
@@ -111,17 +116,23 @@ class LasertrapSpell : MonoBehaviour, Spell
         return laser;
     }
 
-    Union2<WandAction.Drain, WandAction.Vibrate> Spell.Select()
+    TWandAction[] Spell.Select()
     {
         Init();
-        return new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500));
+        TWandAction[] actions = {
+            new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500)),
+        };
+        return actions;
     }
 
-    void Spell.Deselect()
+    TWandAction[] Spell.Deselect()
     {
         Destroy(trapSource);
         Destroy(trapTarget);
         trapSource = null;
         trapTarget = null;
+
+        TWandAction[] actions = { };
+        return actions;
     }
 }

@@ -1,7 +1,10 @@
-﻿using System;
+using System;
 using UnityEngine;
 
-public class ChaosSpell : Spell { 
+using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
+
+public class ChaosSpell : Spell
+{
     private GameObject potionPrefab;
     private Material material;
     private Camera mainCamera;
@@ -9,26 +12,26 @@ public class ChaosSpell : Spell {
     Vector3 lastWandPosition;
     int currentPositionIndex;
 
-    public ChaosSpell ()
+    public ChaosSpell()
     {
         potionPrefab = Resources.Load("ChaosPotion") as GameObject;
-        material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material;
+        material = Resources.Load("ChaosSpellThumbnailMaterial", typeof(Material)) as Material;
         mainCamera = Camera.main;
         lastWandPosition = new Vector3();
         currentPositionIndex = 0;
     }
 
-    public string GetName ()
+    public string GetName()
     {
         return "Chaos";
     }
 
-    public Material GetThumbnail ()
+    public Material GetThumbnail()
     {
         return material;
     }
 
-    public void UpdateSpell (TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
+    TWandAction[] Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
         if (triggerState.down)
         {
@@ -54,18 +57,28 @@ public class ChaosSpell : Spell {
             Rigidbody potionRigibody = potion.gameObject.GetComponent<Rigidbody> ();
             potionRigibody.velocity = Time.deltaTime * (wandPosition - lastWandPosition) * 18000f;
             float torqueMultiplier = 100f;
-            potionRigibody.AddTorque (
-                UnityEngine.Random.Range (-torqueMultiplier, torqueMultiplier), 
-                UnityEngine.Random.Range (-torqueMultiplier, torqueMultiplier), 
-                UnityEngine.Random.Range (-torqueMultiplier, torqueMultiplier) * 100f );
+            potionRigibody.AddTorque(
+                UnityEngine.Random.Range(-torqueMultiplier, torqueMultiplier),
+                UnityEngine.Random.Range(-torqueMultiplier, torqueMultiplier),
+                UnityEngine.Random.Range(-torqueMultiplier, torqueMultiplier) * 100f);
         }
+
+        TWandAction[] actions = { };
+        return actions;
     }
 
-    Union2<WandAction.Drain, WandAction.Vibrate> Spell.Select()
+    TWandAction[] Spell.Select()
     {
-        return new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500));
+        TWandAction[] actions = {
+            new TWandAction.Case2(new WandAction.Vibrate(500)),
+        };
+        return actions;
     }
 
 
-    void Spell.Deselect() { }
+    TWandAction[] Spell.Deselect()
+    {
+        TWandAction[] actions = { };
+        return actions;
+    }
 }

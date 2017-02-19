@@ -1,6 +1,8 @@
 using UnityEngine;
 using System;
 
+using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
+
 public class MeteorSpell : Spell
 {
 
@@ -19,7 +21,7 @@ public class MeteorSpell : Spell
         this.meteorPrefab = Resources.Load ("MeteorSpellPrefabs/Meteor2") as GameObject;
     }
 
-    void Spell.UpdateSpell (
+    TWandAction[] Spell.UpdateSpell (
         TriggerState triggerState, 
         Vector2 touchpadAxis, 
         Vector3 wandPosition,
@@ -32,6 +34,8 @@ public class MeteorSpell : Spell
             RightTriggerUp ();
         }
 
+        TWandAction[] actions = { };
+        return actions;
     }
 
     private void RightTriggerDown ()
@@ -84,18 +88,17 @@ public class MeteorSpell : Spell
         return "Meteor";
     }
 
-    // Update is called once per frame
-    void Update ()
+    TWandAction[] Spell.Select ()
     {
-    
+        TWandAction[] actions = {
+            new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500)),
+        };
+        return actions;
     }
 
-    Union2<WandAction.Drain, WandAction.Vibrate> Spell.Select ()
+    TWandAction[] Spell.Deselect ()
     {
-        return new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500));
-    }
-
-    void Spell.Deselect ()
-    {
+        TWandAction[] actions = { };
+        return actions;
     }
 }

@@ -1,19 +1,22 @@
 using UnityEngine;
 
-public interface Spell {
+using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
 
-	Material GetThumbnail ();
+public interface Spell
+{
 
-	string GetName();
+    Material GetThumbnail();
 
-	void UpdateSpell(
-		TriggerState triggerState, 
-		Vector2 touchpadAxis, 
-		Vector3 wandPosition,
-		Vector3 wandDirection
-	);
+    string GetName();
 
-    Union2<WandAction.Drain, WandAction.Vibrate> Select();
+    TWandAction[] UpdateSpell(
+        TriggerState triggerState,
+        Vector2 touchpadAxis,
+        Vector3 wandPosition,
+        Vector3 wandDirection
+    );
 
-    void Deselect();
+    TWandAction[] Select();
+
+    TWandAction[] Deselect();
 }

@@ -1,6 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
+using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
+using System;
+using WandAction;
+
 public class WandController : MonoBehaviour
 {
     const int up = 4;
@@ -43,15 +47,30 @@ public class WandController : MonoBehaviour
         listOfSpells.Add(new LasertrapSpell());
         listOfSpells.Add(new ChaosSpell());
 
-        Union2<WandAction.Drain, WandAction.Vibrate> wandAction = listOfSpells[currentSpellIndex].Select();
+        TWandAction[] wandActions = SelectedSpell().Select();
 
-        wandAction.Match<Unit>(
-            drain => { return Unit.Instance; },
-            vibrate => { controller.TriggerHapticPulse(vibrate.microseconds); return Unit.Instance; }
-        );
+        ExecuteWandActions(wandActions);
 
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();
+    }
+
+    private void ExecuteWandActions(TWandAction[] wandActions)
+    {
+        foreach (TWandAction wandAction in wandActions)
+        {
+            wandAction.Match(
+                drain =>
+                {
+                    throw new NotImplementedException();
+                },
+                vibrate =>
+                {
+                    controller.TriggerHapticPulse(vibrate.microseconds);
+                    return Unit.Instance;
+                }
+            );
+        }
     }
 
     // Update is called once per frame
@@ -63,7 +82,7 @@ public class WandController : MonoBehaviour
 
         Vector3 normalizedDirection = tipOfWand.position - transform.position;
         normalizedDirection.Normalize();
-        listOfSpells[currentSpellIndex].UpdateSpell(
+        TWandAction[] wandActions = SelectedSpell().UpdateSpell(
           new TriggerState(
             controller.GetPressUp(triggerButton),
             controller.GetPressDown(triggerButton),
@@ -73,6 +92,22 @@ public class WandController : MonoBehaviour
           transform.position,
           normalizedDirection
         );
+        ExecuteWandActions(wandActions);
+    }
+
+    private Spell SelectedSpell()
+    {
+        return listOfSpells[currentSpellIndex];
+    }
+
+    private void SelectSpellByIndex(int newSpellIndex)
+    {
+        currentSpellIndex = newSpellIndex;
+    }
+
+    private int GetSpellIndexPlus(int delta)
+    {
+        return ((currentSpellIndex + delta) % listOfSpells.Count + listOfSpells.Count) % listOfSpells.Count;
     }
 
     void SpellSelect()
@@ -83,30 +118,28 @@ public class WandController : MonoBehaviour
             int newSpellIndex = currentSpellIndex;
             if (direction == left)
             {
-                newSpellIndex = ((currentSpellIndex - 1) % listOfSpells.Count + listOfSpells.Count) % listOfSpells.Count;
+                newSpellIndex = GetSpellIndexPlus(-1);
             }
             if (direction == right)
             {
-                newSpellIndex = (currentSpellIndex + 1) % listOfSpells.Count;
+                newSpellIndex = GetSpellIndexPlus(1);
             }
             if (newSpellIndex != currentSpellIndex)
             {
-                listOfSpells[currentSpellIndex].Deselect();
-                Union2<WandAction.Drain, WandAction.Vibrate> wandAction = listOfSpells[newSpellIndex].Select();
-                currentSpellIndex = newSpellIndex;
+                TWandAction[] wandActions;
+                wandActions = SelectedSpell().Deselect();
+                ExecuteWandActions(wandActions);
+                SelectSpellByIndex(newSpellIndex);
+                wandActions = SelectedSpell().Select();
+                ExecuteWandActions(wandActions);
                 UpdateThumbnail();
-
-                wandAction.Match<Unit>(
-                    drain => { return Unit.Instance; },
-                    vibrate => { controller.TriggerHapticPulse(vibrate.microseconds); return Unit.Instance; }
-                );
             }
         }
     }
 
     void UpdateThumbnail()
     {
-        thumbnailPanel.GetComponent<Renderer>().material = listOfSpells[currentSpellIndex].GetThumbnail();
+        thumbnailPanel.GetComponent<Renderer>().material = SelectedSpell().GetThumbnail();
     }
 
     void Teleport()
