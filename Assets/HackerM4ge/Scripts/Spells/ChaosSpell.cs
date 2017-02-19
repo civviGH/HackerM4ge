@@ -7,6 +7,7 @@ public class ChaosSpell : Spell {
     private Camera mainCamera;
     private GameObject potion;
     Vector3[] lastPositions;
+    Vector3 lastPosition;
     int currentPositionIndex;
 
     public ChaosSpell ()
@@ -15,6 +16,7 @@ public class ChaosSpell : Spell {
         material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material;
         mainCamera = Camera.main;
         lastPositions = new Vector3[10];
+        lastPosition = new Vector3();
         currentPositionIndex = 0;
     }
 
@@ -32,13 +34,13 @@ public class ChaosSpell : Spell {
     {
         if (triggerState.down)
         {
-            Debug.Log ("trigger down chaos potion");
+            Debug.Log("trigger down chaos potion");
             // check if wand is visible in the camera view
             Plane[] planes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
             Bounds wandBounds = new Bounds(wandPosition, new Vector3(0.1f, 0.1f, 0.1f));
             if (!GeometryUtility.TestPlanesAABB(planes, wandBounds))
             {
-                Debug.Log ("potion spawn");
+                Debug.Log("potion spawn");
                 potion = GameObject.Instantiate(potionPrefab) as GameObject;
             }
         }
@@ -46,26 +48,20 @@ public class ChaosSpell : Spell {
         {
             potion.transform.position = wandPosition + wandDirection;
             lastPositions[currentPositionIndex % 10] = wandPosition;
-
-            for (int i=0; i<Math.Min(currentPositionIndex, 10); i++)
-            {
-                Debug.Log (lastPositions [i]);
- 
-            }
-            Debug.Log ("-----");
-            Debug.Log (currentPositionIndex);
+            lastPosition = wandPosition;
             currentPositionIndex++;
         }
         else if (triggerState.up && potion != null)
         {
-            Vector3 sum = new Vector3(0f, 0f, 0f);
+            /* Vector3 sum = new Vector3(0f, 0f, 0f);
             int Length = Math.Min(currentPositionIndex, 10);
             for (int i=0; i<Length; i++)
             {
                 sum += lastPositions[i];
             }
             sum /= Length; // TODO division by zero
-            potion.gameObject.GetComponent<Rigidbody>().velocity = (wandPosition - sum) * 10f;
+            */
+            potion.gameObject.GetComponent<Rigidbody>().velocity = (wandPosition - lastPosition) * 10f;
         }
     }
 
