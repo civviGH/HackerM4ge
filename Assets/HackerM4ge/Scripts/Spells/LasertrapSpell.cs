@@ -73,18 +73,22 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private static GameObject CreateLaser(Vector3 from, Vector3 to)
     {
-        GameObject line = new GameObject();
-        line.AddComponent<LineRenderer>();
-        line.GetComponent<LineRenderer>().numPositions = 2;
-        line.GetComponent<LineRenderer>().SetPosition(0, from);
-        line.GetComponent<LineRenderer>().SetPosition(1, to);
-        line.GetComponent<LineRenderer>().startWidth = 0.01f;
-        line.GetComponent<LineRenderer>().endWidth = 0.01f;
-        line.GetComponent<LineRenderer>().startColor = Color.red;
-        line.GetComponent<LineRenderer>().endColor = Color.red;
-        line.GetComponent<LineRenderer>().material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
+        GameObject laser = new GameObject();
+        laser.AddComponent<LineRenderer>();
+        laser.GetComponent<LineRenderer>().numPositions = 2;
+        laser.GetComponent<LineRenderer>().SetPosition(0, from);
+        laser.GetComponent<LineRenderer>().SetPosition(1, to);
+        laser.GetComponent<LineRenderer>().startWidth = 0.01f;
+        laser.GetComponent<LineRenderer>().endWidth = 0.01f;
+        laser.GetComponent<LineRenderer>().startColor = Color.red;
+        laser.GetComponent<LineRenderer>().endColor = Color.red;
+        laser.GetComponent<LineRenderer>().material = new Material(Shader.Find("Particles/Alpha Blended Premultiply"));
 
-        return line;
+        laser.AddComponent<LaserRay>();
+        laser.GetComponent<LaserRay>().from = from;
+        laser.GetComponent<LaserRay>().to = to;
+
+        return laser;
     }
 
     void Spell.Select()

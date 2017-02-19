@@ -15,7 +15,7 @@ abstract public class Enemy : MonoBehaviour {
 
     private float speed;
 
-    public enum DamageType { Fire, Water, Earth, Wind, Physical, Electricity, Love};
+    public enum DamageType { Fire, Water, Earth, Wind, Physical, Electricity, Love, Light };
 
     public void Knockback(float strength) {
         // TODO
