@@ -46,12 +46,8 @@ public class MeteorController : MonoBehaviour
                                             LayerMask.GetMask ("Damagable"));
 
             foreach (Collider damagedEnemy in damagedEnemies){
-                Transform myTransform = damagedEnemy.transform;
-                GameObject myGameObject = myTransform.gameObject;
-                Debug.Log (myGameObject.GetType().Name);
-                Enemy myEnemy = myGameObject.GetComponent<Enemy> ();
-                myEnemy.damage(100f, Enemy.DamageType.Fire);
-            }  
+                damagedEnemy.transform.gameObject.GetComponent<Enemy>().damage(100f, Enemy.DamageType.Fire);
+            }
 
             // fade out fire sound
             fireSoundObject.transform.parent = null;
