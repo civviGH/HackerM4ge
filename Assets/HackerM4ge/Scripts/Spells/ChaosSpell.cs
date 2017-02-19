@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class ChaosSpell : Spell
 {
-    private UnityEngine.Object potionPrefab;
+    private GameObject potionPrefab;
     private Material material;
     private Camera mainCamera;
     private GameObject potion;
@@ -12,7 +12,7 @@ public class ChaosSpell : Spell
 
     public ChaosSpell ()
     {
-        potionPrefab = Resources.Load("ChaosPotion");
+        potionPrefab = Resources.Load("ChaosPotion") as GameObject;
         material = Resources.Load ("ChaosSpellThumbnailMaterial", typeof(Material)) as Material;
         mainCamera = Camera.main;
         lastPositions = new Vector3[10];
@@ -33,11 +33,13 @@ public class ChaosSpell : Spell
     {
         if (triggerState.down)
         {
+            Debug.Log ("trigger down chaos potion");
             // check if wand is visible in the camera view
             Plane[] planes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
-            Bounds wandBounds = new Bounds(wandPosition, new Vector3(1f, 1f, 1f));
+            Bounds wandBounds = new Bounds(wandPosition, new Vector3(0.1f, 0.1f, 0.1f));
             if (!GeometryUtility.TestPlanesAABB(planes, wandBounds))
             {
+                Debug.Log ("potion spawn");
                 potion = GameObject.Instantiate(potionPrefab) as GameObject;
             }
         }
@@ -45,6 +47,14 @@ public class ChaosSpell : Spell
         {
             potion.transform.position = wandPosition + wandDirection;
             lastPositions[currentPositionIndex % 10] = wandPosition;
+
+            for (int i=0; i<Math.Min(currentPositionIndex, 10); i++)
+            {
+                Debug.Log (lastPositions [i]);
+ 
+            }
+            Debug.Log ("-----");
+            Debug.Log (currentPositionIndex);
             currentPositionIndex++;
         }
         else if (triggerState.up && potion != null)
