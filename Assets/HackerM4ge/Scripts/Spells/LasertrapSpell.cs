@@ -4,7 +4,7 @@ using UnityEngine;
 class LasertrapSpell : MonoBehaviour, Spell
 {
     const float minimalDistance = 0.2f;
-    const float maxSpeed = 20f;
+    const float maxSpeed = 15f;
 
     private UnityEngine.Object laserSourcePrefab;
     private Material laserBeamHazardMaterial;
@@ -18,7 +18,7 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
         laserBeamHazardMaterial = Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
-        surfaceLayer = LayerMask.GetMask("Surface");
+        surfaceLayer = LayerMask.GetMask("Surfaces");
 
         trapSourceDistance = minimalDistance;
     }
@@ -67,14 +67,10 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void UpdateTrapSource(ref GameObject trapSource, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
-        Debug.Log("touchpadAxis.y = " + touchpadAxis.y);
-        float distance = touchpadAxis.y * touchpadAxis.y * Time.deltaTime * maxSpeed;
-        Debug.Log("delta-distance = " + distance);
+        float distance = Math.Sign(touchpadAxis.y) * touchpadAxis.y * touchpadAxis.y * Time.deltaTime * maxSpeed;
         trapSourceDistance += distance;
-        Debug.Log("trapSourceDistance = " + trapSourceDistance);
         if(trapSourceDistance < minimalDistance)
         {
-            Debug.Log("trapSourceDistance = minimalDistance");
             trapSourceDistance = minimalDistance;
         }
         UpdateTrapSourcePosition(ref trapSource, trapSourceDistance, wandPosition, wandDirection);
@@ -88,10 +84,7 @@ class LasertrapSpell : MonoBehaviour, Spell
         float currentDistance = trapSourceDistance;
         if (Physics.Raycast(ray, out hitObject, trapSourceDistance, surfaceLayer))
         {
-            Debug.Log("Ray hit at distance " + hitObject.distance);
-            Debug.Log("trapSourceDistance = " + trapSourceDistance);
             currentDistance = Math.Max(hitObject.distance - 0.5f, minimalDistance);
-            Debug.Log("Restrict trapSource distance to " + currentDistance);
         }
 
         trapSource.transform.position = wandPosition + wandDirection * currentDistance;
