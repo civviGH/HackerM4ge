@@ -78,7 +78,7 @@ public class WandController : MonoBehaviour
             int newSpellIndex = currentSpellIndex;
             if (direction == left)
             {
-                newSpellIndex = (currentSpellIndex - 1) % listOfSpells.Count;
+                newSpellIndex = ((currentSpellIndex - 1) % listOfSpells.Count + listOfSpells.Count) % listOfSpells.Count;
             }
             if (direction == right)
             {

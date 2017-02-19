@@ -23,11 +23,7 @@ public class LaserRay : MonoBehaviour
         float maxDistance = (to - from).magnitude;
         if (Physics.Raycast(ray, out hitObject, maxDistance, damagableLayer))
         {
-            Debug.Log("Hit");
-            Collider myCollider = hitObject.collider;
-            Transform myTransform = myCollider.transform;
-            GameObject myGameObject = myTransform.gameObject;
-            Enemy enemy = myGameObject.GetComponent<Enemy>();
+            Enemy enemy = hitObject.collider.transform.gameObject.GetComponent<Enemy>();
             enemy.damage(Time.deltaTime * dps, Enemy.DamageType.Light);
         }
     }
