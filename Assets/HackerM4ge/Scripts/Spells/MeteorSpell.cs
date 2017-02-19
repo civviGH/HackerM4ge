@@ -90,8 +90,9 @@ public class MeteorSpell : Spell
     
     }
 
-    void Spell.Select ()
+    Union2<WandAction.Drain, WandAction.Vibrate> Spell.Select ()
     {
+        return new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500));
     }
 
     void Spell.Deselect ()

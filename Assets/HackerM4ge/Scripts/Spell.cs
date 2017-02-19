@@ -13,7 +13,7 @@ public interface Spell {
 		Vector3 wandDirection
 	);
 
-    void Select();
+    Union2<WandAction.Drain, WandAction.Vibrate> Select();
 
     void Deselect();
 }

@@ -43,7 +43,13 @@ public class WandController : MonoBehaviour
         listOfSpells.Add(new LasertrapSpell());
         listOfSpells.Add(new ChaosSpell());
 
-        listOfSpells[currentSpellIndex].Select();
+        Union2<WandAction.Drain, WandAction.Vibrate> wandAction = listOfSpells[currentSpellIndex].Select();
+
+        wandAction.Match<Unit>(
+            drain => { return Unit.Instance; },
+            vibrate => { controller.TriggerHapticPulse(vibrate.microseconds); return Unit.Instance; }
+        );
+
 
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();

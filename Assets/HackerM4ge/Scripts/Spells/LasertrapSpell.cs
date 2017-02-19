@@ -111,9 +111,10 @@ class LasertrapSpell : MonoBehaviour, Spell
         return laser;
     }
 
-    void Spell.Select()
+    Union2<WandAction.Drain, WandAction.Vibrate> Spell.Select()
     {
         Init();
+        return new Union2<WandAction.Drain, WandAction.Vibrate>.Case2(new WandAction.Vibrate(500));
     }
 
     void Spell.Deselect()

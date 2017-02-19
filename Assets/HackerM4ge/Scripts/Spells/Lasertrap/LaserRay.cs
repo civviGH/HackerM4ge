@@ -14,10 +14,6 @@ public class LaserRay : MonoBehaviour
 
     void Update()
     {
-        if(from == null || to == null)
-        {
-            return;
-        }
         Ray ray = new Ray(from, to-from);
         float maxDistance = (to - from).magnitude;
         RaycastHit[] hits = Physics.RaycastAll(ray, maxDistance, damagableLayer);
