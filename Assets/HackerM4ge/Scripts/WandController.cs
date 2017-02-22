@@ -12,6 +12,12 @@ public class WandController : MonoBehaviour
     const int down = 2;
     const int noDirection = 0;
 
+    enum ControllerType
+    {
+        Vive,
+        Oculus,
+    };
+
     public Transform tipOfWand;
 
     public AudioSource teleportSound;
@@ -29,7 +35,8 @@ public class WandController : MonoBehaviour
 
     // controller initalize
     private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
-    private string controllerManufacturer;
+
+    private ControllerType controllerType;
 
     private SteamVR_TrackedObject trackedObj;
 
@@ -54,7 +61,22 @@ public class WandController : MonoBehaviour
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();
 
-        controllerManufacturer = (new SteamVRHelper.Helper()).GetTrackedDeviceManufacturerString(controller.index);
+        DetectControllerType();
+        //Debug.Log(string.Format("{0} Controller detected", Enum.GetName(typeof(ControllerType), controllerType)));
+    }
+
+    private void DetectControllerType()
+    {
+        string manufacturer = (new SteamVRHelper.Helper()).GetTrackedDeviceManufacturerString(controller.index);
+
+        switch(manufacturer) {
+            case "Oculus":
+                controllerType = ControllerType.Oculus;
+                break;
+            default:
+                controllerType = ControllerType.Vive;
+                break;
+        }
     }
 
     private void ExecuteWandActions(TWandAction[] wandActions)
