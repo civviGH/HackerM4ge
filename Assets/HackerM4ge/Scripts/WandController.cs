@@ -21,8 +21,6 @@ public class WandController : MonoBehaviour
         Oculus,
     };
 
-    public Transform tipOfWand;
-
     public AudioSource teleportSound;
 
     public GameObject thumbnailPanel;
@@ -107,7 +105,7 @@ public class WandController : MonoBehaviour
         ShowTeleportDirection();
         Teleport();
 
-        Vector3 normalizedDirection = tipOfWand.position - transform.position;
+        Vector3 normalizedDirection = WandDirection();
         normalizedDirection.Normalize();
         TWandAction[] wandActions = SelectedSpell().UpdateSpell(
           new TriggerState(
@@ -193,7 +191,7 @@ public class WandController : MonoBehaviour
     GameObject GetNextPlatform()
     {
         RaycastHit hitObject;
-        Ray ray = new Ray(transform.position, tipOfWand.position - transform.position);
+        Ray ray = new Ray(transform.position, WandDirection());
         if (Physics.Raycast(ray, out hitObject))
         {
             if (hitObject.collider.transform.parent != null)
@@ -223,7 +221,7 @@ public class WandController : MonoBehaviour
             lineRenderer.endColor = Color.blue;
             lineRenderer.startWidth = 0.01f;
             lineRenderer.endWidth = 0.01f;
-            Vector3 wandDirection = tipOfWand.position - transform.position;
+            Vector3 wandDirection = WandDirection();
 
             lineRenderer.SetPosition(0, transform.position);
             lineRenderer.SetPosition(1, transform.position + 20 * wandDirection);
@@ -231,7 +229,7 @@ public class WandController : MonoBehaviour
 
         if (controller.GetPress(touchpad) && teleportLine != null)
         {
-            Vector3 wandDirection = tipOfWand.position - transform.position;
+            Vector3 wandDirection = WandDirection();
 
             LineRenderer lineRenderer = teleportLine.GetComponent<LineRenderer>();
             lineRenderer.SetPosition(0, transform.position);
@@ -278,6 +276,21 @@ public class WandController : MonoBehaviour
         if (axes[1] > 0.7)
             return Direction.up;
         return Direction.noDirection;
+    }
+
+    private Vector3 WandDirection()
+    {
+        switch(controllerType)
+        {
+            case ControllerType.Oculus:
+                return transform.forward - transform.up;
+                break;
+            case ControllerType.Vive:
+                return transform.forward;
+                break;
+            default:
+                throw new NotImplementedException();
+        }
     }
 
 }
