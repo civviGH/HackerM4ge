@@ -6,11 +6,14 @@ using System;
 
 public class WandController : MonoBehaviour
 {
-    const int up = 4;
-    const int right = 1;
-    const int left = 3;
-    const int down = 2;
-    const int noDirection = 0;
+    enum Direction
+    {
+        noDirection = 0,
+        right = 1,
+        down = 2,
+        left = 3,
+        up = 4,
+    };
 
     enum ControllerType
     {
@@ -138,13 +141,13 @@ public class WandController : MonoBehaviour
     {
         if (controller.GetPressDown(touchpad))
         {
-            int direction = GetDirectionOfTouchpad();
+            Direction direction = GetDirectionOfTouchpad();
             int newSpellIndex = currentSpellIndex;
-            if (direction == left)
+            if (direction == Direction.left)
             {
                 newSpellIndex = GetSpellIndexPlus(-1);
             }
-            if (direction == right)
+            if (direction == Direction.right)
             {
                 newSpellIndex = GetSpellIndexPlus(1);
             }
@@ -207,8 +210,8 @@ public class WandController : MonoBehaviour
 
     void ShowTeleportDirection()
     {
-        int direction = GetDirectionOfTouchpad();
-        if (controller.GetPressDown(touchpad) && direction == up)
+        Direction direction = GetDirectionOfTouchpad();
+        if (controller.GetPressDown(touchpad) && direction == Direction.up)
         {
             teleportLine = new GameObject();
             teleportLine.transform.position = transform.position;
@@ -263,18 +266,18 @@ public class WandController : MonoBehaviour
     }
 
     // Returns direction of the touchpad when pressed, Tobi(s füße) stinkt.
-    private int GetDirectionOfTouchpad()
+    private Direction GetDirectionOfTouchpad()
     {
         Vector2 axes = controller.GetAxis();
         if (axes[0] < -0.7)
-            return left;
+            return Direction.left;
         if (axes[0] > 0.7)
-            return right;
+            return Direction.right;
         if (axes[1] < -0.7)
-            return down;
+            return Direction.down;
         if (axes[1] > 0.7)
-            return up;
-        return noDirection;
+            return Direction.up;
+        return Direction.noDirection;
     }
 
 }
