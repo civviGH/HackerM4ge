@@ -3,7 +3,6 @@ using System.Collections.Generic;
 
 using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
 using System;
-using WandAction;
 
 public class WandController : MonoBehaviour
 {
@@ -30,6 +29,7 @@ public class WandController : MonoBehaviour
 
     // controller initalize
     private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
+    private string controllerManufacturer;
 
     private SteamVR_TrackedObject trackedObj;
 
@@ -53,6 +53,8 @@ public class WandController : MonoBehaviour
 
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();
+
+        controllerManufacturer = (new SteamVRHelper.Helper()).GetTrackedDeviceManufacturerString(controller.index);
     }
 
     private void ExecuteWandActions(TWandAction[] wandActions)
