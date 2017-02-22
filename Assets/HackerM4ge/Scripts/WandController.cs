@@ -29,12 +29,18 @@ public class WandController : MonoBehaviour
     private GameObject highlightedPlatform;
 
     // buttons
-    private Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
-    private Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
-    private Valve.VR.EVRButtonId menuButton = Valve.VR.EVRButtonId.k_EButton_ApplicationMenu;
-    private Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
+    private const Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
+    private const Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
+    private const Valve.VR.EVRButtonId menuButton = Valve.VR.EVRButtonId.k_EButton_ApplicationMenu;
+    private const Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
+
+    private const Valve.VR.EVRButtonId touchButtonA = Valve.VR.EVRButtonId.k_EButton_A;
+    private const Valve.VR.EVRButtonId touchButtonB = Valve.VR.EVRButtonId.k_EButton_ApplicationMenu;
+
+    private Direction lastFrameTouchpadDirection = Direction.noDirection;
 
     // controller initalize
+    // TODO This should be a method, not a property...
     private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
 
     private ControllerType controllerType;
@@ -118,6 +124,8 @@ public class WandController : MonoBehaviour
           normalizedDirection
         );
         ExecuteWandActions(wandActions);
+
+        lastFrameTouchpadDirection = GetDirectionOfTouchpad();
     }
 
     private Spell SelectedSpell()
@@ -137,13 +145,12 @@ public class WandController : MonoBehaviour
 
     void SpellSelect()
     {
-        Direction direction = GetDirectionOfTouchpad();
         int newSpellIndex = currentSpellIndex;
-        if (SpellSelectPreviousDown(direction))
+        if (SpellSelectPreviousDown())
         {
             newSpellIndex = GetSpellIndexPlus(-1);
         }
-        if (SpellSelectNextDown(direction))
+        if (SpellSelectNextDown())
         {
             newSpellIndex = GetSpellIndexPlus(1);
         }
@@ -280,39 +287,79 @@ public class WandController : MonoBehaviour
         {
             case ControllerType.Oculus:
                 return transform.forward - transform.up;
-                break;
             case ControllerType.Vive:
                 return transform.forward;
-                break;
             default:
                 throw new NotImplementedException();
         }
     }
 
-    bool TeleportButtonPressed()
+    private bool TeleportButtonPressed()
     {
-        return controller.GetPress(touchpad);
+        switch(controllerType)
+        {
+            case ControllerType.Oculus:
+                return controller.GetPress(touchButtonA);
+            case ControllerType.Vive:
+                return controller.GetPress(touchpad);
+            default:
+                throw new NotImplementedException();
+        }
     }
 
     private bool TeleportButtonUp()
     {
-        return controller.GetPressUp(touchpad);
+        switch (controllerType)
+        {
+            case ControllerType.Oculus:
+                return controller.GetPressUp(touchButtonA);
+            case ControllerType.Vive:
+                return controller.GetPressUp(touchpad);
+            default:
+                throw new NotImplementedException();
+        }
     }
 
-    bool TeleportButtonDown()
+    private bool TeleportButtonDown()
     {
         Direction direction = GetDirectionOfTouchpad();
-        return controller.GetPressDown(touchpad) && direction == Direction.up;
+        switch (controllerType)
+        {
+            case ControllerType.Oculus:
+                return controller.GetPressDown(touchButtonA);
+            case ControllerType.Vive:
+                return controller.GetPressDown(touchpad) && direction == Direction.up;
+            default:
+                throw new NotImplementedException();
+        }
     }
 
-    private bool SpellSelectNextDown(Direction direction)
+    private bool SpellSelectNextDown()
     {
-        return controller.GetPressDown(touchpad) && direction == Direction.right;
+        Direction direction = GetDirectionOfTouchpad();
+        switch (controllerType)
+        {
+            case ControllerType.Oculus:
+                return lastFrameTouchpadDirection != direction && direction == Direction.right;
+            case ControllerType.Vive:
+                return controller.GetPressDown(touchpad) && direction == Direction.right;
+            default:
+                throw new NotImplementedException();
+        }
     }
 
-    private bool SpellSelectPreviousDown(Direction direction)
+    private bool SpellSelectPreviousDown()
     {
-        return controller.GetPressDown(touchpad) && direction == Direction.left;
+        Direction direction = GetDirectionOfTouchpad();
+        switch (controllerType)
+        {
+            case ControllerType.Oculus:
+                return lastFrameTouchpadDirection != direction && direction == Direction.left;
+            case ControllerType.Vive:
+                return controller.GetPressDown(touchpad) && direction == Direction.left;
+            default:
+                throw new NotImplementedException();
+        }
     }
 
 }

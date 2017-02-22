@@ -31,9 +31,7 @@ abstract public class Enemy : MonoBehaviour {
     public void damage(float strength, DamageType type)
     {
         health -= strength;
-        Debug.Log ("Damage: " + strength + " | Leben: " + health); 
         if (health <= 0f) {
-            Debug.Log ("ich wär gestorben.");
             Destroy (gameObject);
         }
     }
