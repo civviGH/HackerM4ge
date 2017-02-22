@@ -137,28 +137,25 @@ public class WandController : MonoBehaviour
 
     void SpellSelect()
     {
-        if (controller.GetPressDown(touchpad))
+        Direction direction = GetDirectionOfTouchpad();
+        int newSpellIndex = currentSpellIndex;
+        if (SpellSelectPreviousDown(direction))
         {
-            Direction direction = GetDirectionOfTouchpad();
-            int newSpellIndex = currentSpellIndex;
-            if (direction == Direction.left)
-            {
-                newSpellIndex = GetSpellIndexPlus(-1);
-            }
-            if (direction == Direction.right)
-            {
-                newSpellIndex = GetSpellIndexPlus(1);
-            }
-            if (newSpellIndex != currentSpellIndex)
-            {
-                TWandAction[] wandActions;
-                wandActions = SelectedSpell().Deselect();
-                ExecuteWandActions(wandActions);
-                SelectSpellByIndex(newSpellIndex);
-                wandActions = SelectedSpell().Select();
-                ExecuteWandActions(wandActions);
-                UpdateThumbnail();
-            }
+            newSpellIndex = GetSpellIndexPlus(-1);
+        }
+        if (SpellSelectNextDown(direction))
+        {
+            newSpellIndex = GetSpellIndexPlus(1);
+        }
+        if (newSpellIndex != currentSpellIndex)
+        {
+            TWandAction[] wandActions;
+            wandActions = SelectedSpell().Deselect();
+            ExecuteWandActions(wandActions);
+            SelectSpellByIndex(newSpellIndex);
+            wandActions = SelectedSpell().Select();
+            ExecuteWandActions(wandActions);
+            UpdateThumbnail();
         }
     }
 
@@ -169,7 +166,7 @@ public class WandController : MonoBehaviour
 
     void Teleport()
     {
-        if (controller.GetPressUp(touchpad))
+        if (TeleportButtonUp())
         {
             if (teleportLine != null)
             {
@@ -208,8 +205,7 @@ public class WandController : MonoBehaviour
 
     void ShowTeleportDirection()
     {
-        Direction direction = GetDirectionOfTouchpad();
-        if (controller.GetPressDown(touchpad) && direction == Direction.up)
+        if (TeleportButtonDown())
         {
             teleportLine = new GameObject();
             teleportLine.transform.position = transform.position;
@@ -227,7 +223,7 @@ public class WandController : MonoBehaviour
             lineRenderer.SetPosition(1, transform.position + 20 * wandDirection);
         }
 
-        if (controller.GetPress(touchpad) && teleportLine != null)
+        if (TeleportButtonPressed() && teleportLine != null)
         {
             Vector3 wandDirection = WandDirection();
 
@@ -291,6 +287,32 @@ public class WandController : MonoBehaviour
             default:
                 throw new NotImplementedException();
         }
+    }
+
+    bool TeleportButtonPressed()
+    {
+        return controller.GetPress(touchpad);
+    }
+
+    private bool TeleportButtonUp()
+    {
+        return controller.GetPressUp(touchpad);
+    }
+
+    bool TeleportButtonDown()
+    {
+        Direction direction = GetDirectionOfTouchpad();
+        return controller.GetPressDown(touchpad) && direction == Direction.up;
+    }
+
+    private bool SpellSelectNextDown(Direction direction)
+    {
+        return controller.GetPressDown(touchpad) && direction == Direction.right;
+    }
+
+    private bool SpellSelectPreviousDown(Direction direction)
+    {
+        return controller.GetPressDown(touchpad) && direction == Direction.left;
     }
 
 }
