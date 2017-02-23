@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Valve.VR;
@@ -10,6 +11,16 @@ namespace SteamVRHelper
         Vive,
         Oculus,
     };
+
+    public enum Direction
+    {
+        noDirection = 0,
+        right = 1,
+        down = 2,
+        left = 3,
+        up = 4,
+    };
+
 
     public class Helper
     {
@@ -43,6 +54,33 @@ namespace SteamVRHelper
                 default:
                     return ControllerType.Vive;
             }
+        }
+
+        public static Vector3 WandDirection(Transform transform, ControllerType controllerType)
+        {
+            switch (controllerType)
+            {
+                case ControllerType.Oculus:
+                    return transform.forward - transform.up;
+                case ControllerType.Vive:
+                    return transform.forward;
+                default:
+                    throw new NotImplementedException();
+            }
+        }
+
+        public static Direction GetDirectionOfTouchpad(SteamVR_Controller.Device controller)
+        {
+            Vector2 axes = controller.GetAxis();
+            if (axes[0] < -0.7)
+                return Direction.left;
+            if (axes[0] > 0.7)
+                return Direction.right;
+            if (axes[1] < -0.7)
+                return Direction.down;
+            if (axes[1] > 0.7)
+                return Direction.up;
+            return Direction.noDirection;
         }
     }
 

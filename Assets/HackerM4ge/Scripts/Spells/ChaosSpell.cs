@@ -55,6 +55,9 @@ public class ChaosSpell : Spell
         else if (triggerState.up && potion != null)
         {
             Rigidbody potionRigibody = potion.gameObject.GetComponent<Rigidbody> ();
+            // TODO Das hier verwendet die Geschwindigkeit der Hand, nicht der Potion (die ja vor der Hand schwebt).
+            // Wäre es nicht intuitiver, hier die Potion-Positionen zu verwenden?
+            // Außerdem könnte man dann schön aus dem Handgelenk werfen. :)
             potionRigibody.velocity = Time.deltaTime * (wandPosition - lastWandPosition) * 18000f;
             float torqueMultiplier = 100f;
             potionRigibody.AddTorque(
