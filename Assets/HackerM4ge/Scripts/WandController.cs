@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
 using System;
+using SteamVRHelper;
 
 public class WandController : MonoBehaviour
 {
@@ -13,12 +14,6 @@ public class WandController : MonoBehaviour
         down = 2,
         left = 3,
         up = 4,
-    };
-
-    enum ControllerType
-    {
-        Vive,
-        Oculus,
     };
 
     public AudioSource teleportSound;
@@ -68,22 +63,8 @@ public class WandController : MonoBehaviour
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();
 
-        DetectControllerType();
+        controllerType = Helper.GetControllerType(controller);
         //Debug.Log(string.Format("{0} Controller detected", Enum.GetName(typeof(ControllerType), controllerType)));
-    }
-
-    private void DetectControllerType()
-    {
-        string manufacturer = (new SteamVRHelper.Helper()).GetTrackedDeviceManufacturerString(controller.index);
-
-        switch(manufacturer) {
-            case "Oculus":
-                controllerType = ControllerType.Oculus;
-                break;
-            default:
-                controllerType = ControllerType.Vive;
-                break;
-        }
     }
 
     private void ExecuteWandActions(TWandAction[] wandActions)
