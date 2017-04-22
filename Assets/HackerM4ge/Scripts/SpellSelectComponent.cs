@@ -88,7 +88,7 @@ public class SpellSelectComponent : MonoBehaviour {
 
         // Orientation
         var direction = castingRing.transform.position - headCameraObject.transform.position;
-        direction.z = 0;
+        direction.y = 0;
         direction.Normalize();
         castingRing.transform.up = direction;
     }
@@ -138,6 +138,8 @@ public class SpellSelectComponent : MonoBehaviour {
     {
         castingRing = new GameObject();
         castingRing.AddComponent<Torus>();
+        Material material = Resources.Load<Material>("Materials/FireParticleFlameLickSheet");
+        castingRing.GetComponent<Renderer>().material = material;
 
         UpdateCasting();
     }
