@@ -18,6 +18,8 @@ public class SpellSelectComponent : MonoBehaviour {
     public float maxBeginCastingDistance = 0.2f;
     [Range(0.1f, 1f)]
     public float minFinishCastingDistance = 0.6f;
+    [Range(0.01f, 0.1f)]
+    public float shrinkDiameterBy = 0.1f;
 
     private SpellSelectState spellSelectState = SpellSelectState.Idle;
 
@@ -75,7 +77,8 @@ public class SpellSelectComponent : MonoBehaviour {
         // Size
         var distance = Vector3.Magnitude(thisControllerObject.transform.position - leftControllerObject.transform.position);
         distance = Mathf.Min(distance, minFinishCastingDistance);
-        var radius = (distance) / 2f;
+        distance = Mathf.Max(distance, maxBeginCastingDistance);
+        var radius = (distance - shrinkDiameterBy) / 2f;
         castingRing.GetComponent<Torus>().segmentRadius = radius;
         castingRing.GetComponent<Torus>().tubeRadius = radius / 10f;
         // TODO maybe these need to be adjusted
@@ -115,11 +118,12 @@ public class SpellSelectComponent : MonoBehaviour {
                     if (Distance(thisControllerObject, leftControllerObject) > minFinishCastingDistance)
                     {
                         spellSelectState = SpellSelectState.Selecting;
+                        FinishCasting();
                     }
                     else
                     {
                         spellSelectState = SpellSelectState.Idle;
-                        EndCasting();
+                        AbortCasting();
                     }
                 }
                 break;
@@ -138,9 +142,21 @@ public class SpellSelectComponent : MonoBehaviour {
         UpdateCasting();
     }
 
-    private void EndCasting()
+    private void AbortCasting()
     {
         DestroyImmediate(castingRing);
+    }
+
+    private void FinishCasting()
+    {
+        StartCoroutine(EndSelecting());
+    }
+
+    IEnumerator EndSelecting()
+    {
+        yield return new WaitForSeconds(2f);
+        DestroyImmediate(castingRing);
+        spellSelectState = SpellSelectState.Idle;
     }
 
     private bool SelectButtonPressed(SteamVR_Controller.Device controller)
