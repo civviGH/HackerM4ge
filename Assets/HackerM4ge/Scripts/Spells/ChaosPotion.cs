@@ -8,15 +8,13 @@ public class ChaosPotion : MonoBehaviour {
 
     void Start()
     {
-        layerMask = LayerMask.GetMask("Surfaces");
+        layerMask = LayerMask.NameToLayer("Surfaces");
     }
 
     void OnTriggerEnter(Collider collider)
     {
-        Debug.Log ("ontrigger enter");
-        if (collider.gameObject.layer.ToString() == "Surfaces")
+        if (collider.gameObject.layer == layerMask)
         {
-            Debug.Log ("layermask hit");
             Collider[] damagedEnemies = Physics.OverlapSphere(
                 gameObject.transform.position,
                 5f,
@@ -37,7 +35,7 @@ public class ChaosPotion : MonoBehaviour {
             breakingParticles.transform.parent = null;
             breakingParticles.GetComponent<ParticleSystem>().Play();
 
-            Destroy(this);
+            Destroy(gameObject);
         }
     }
 }
