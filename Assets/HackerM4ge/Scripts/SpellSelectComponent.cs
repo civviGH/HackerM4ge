@@ -19,6 +19,9 @@ public class SpellSelectComponent : MonoBehaviour {
 
     private SpellSelectState spellSelectState = SpellSelectState.Idle;
 
+    public GameObject leftController;
+    public GameObject headCamera;
+
     private GameObject castingRing;
 
     private enum SpellSelectState
@@ -32,8 +35,8 @@ public class SpellSelectComponent : MonoBehaviour {
     {
         thisControllerObject = GetComponent<SteamVR_TrackedObject>();
 
-        leftControllerObject = thisControllerObject.transform.parent.FindChild("Controller (left)").gameObject.GetComponent<SteamVR_TrackedObject>();
-        headCameraObject = thisControllerObject.transform.parent.FindChild("Camera (head)").gameObject.GetComponent<SteamVR_TrackedObject>();
+        leftControllerObject = leftController.GetComponent<SteamVR_TrackedObject>();
+        headCameraObject = headCamera.GetComponent<SteamVR_TrackedObject>();
 
         controllerType = Helper.GetControllerType(ThisController());
     }
