@@ -200,13 +200,13 @@ public class SpellSelectComponent : MonoBehaviour {
         float timePassed = now - startTime;
 
         int colorId = Shader.PropertyToID("_TintColor");
-        float initialAlpha = this.GetComponent<Renderer>().material.GetColor(colorId).a;
+        float initialAlpha = castingRing.GetComponent<Renderer>().material.GetColor(colorId).a;
 
         while (timePassed < castingRingFadeOutSeconds)
         {
-            var color = this.GetComponent<Renderer>().material.GetColor(colorId);
+            var color = castingRing.GetComponent<Renderer>().material.GetColor(colorId);
             color.a = initialAlpha * (castingRingFadeOutSeconds - timePassed) / castingRingFadeOutSeconds;
-            this.GetComponent<Renderer>().material.SetColor(colorId, color);
+            castingRing.GetComponent<Renderer>().material.SetColor(colorId, color);
             yield return null;
             now = Time.time;
             timePassed = now - startTime;
