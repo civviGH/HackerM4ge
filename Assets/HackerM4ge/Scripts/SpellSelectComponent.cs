@@ -101,7 +101,9 @@ public class SpellSelectComponent : MonoBehaviour {
         while(castingRing != null)
         {
             rotation = (rotation + Time.deltaTime * 10) % 360;
-            castingRing.transform.localRotation = Quaternion.Euler(Vector3.up * rotation);
+            // Always reset the local rotation before applying ours
+            castingRing.transform.up = castingRing.transform.up;
+            castingRing.transform.Rotate(Vector3.up * rotation);
             yield return null;
         }
         yield break;
