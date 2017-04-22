@@ -3,6 +3,7 @@ using UnityEngine;
 
 abstract public class Enemy : MonoBehaviour {
     private float health;
+    public EnemyMovement movement;
     protected int networkDamage;
 
     public Enemy() {
