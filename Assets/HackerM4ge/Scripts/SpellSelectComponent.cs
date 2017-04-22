@@ -167,8 +167,16 @@ public class SpellSelectComponent : MonoBehaviour {
             var offset = castingRingTransform.forward.normalized * castingRingRadius;
             Quaternion rotation = Quaternion.AngleAxis(angle, castingRingTransform.up);
             var position = castingRingTransform.position + rotation * offset;
-            var spellSelect = Instantiate(spellThumbnailPrefab, position, new Quaternion());
+            var spellSelect = Instantiate (spellThumbnailPrefab, position, new Quaternion());
             spellSelect.GetComponent<Renderer>().material = listOfSpells[i].GetThumbnail();
+            rotation = Quaternion.FromToRotation (castingRingTransform.forward , Vector3.up);
+            // spellSelect.transform.forward = Vector3.up;
+            spellSelect.transform.up = -castingRingTransform.up;
+            var spellEuler = spellSelect.transform.rotation.eulerAngles;
+            spellEuler.x = 90f;
+            spellSelect.transform.rotation = Quaternion.Euler (spellEuler);
+            Debug.Log("CRT: " + castingRingTransform.rotation);
+            Debug.Log ("CRT.up: " + castingRingTransform.up);
         }
     }
 
