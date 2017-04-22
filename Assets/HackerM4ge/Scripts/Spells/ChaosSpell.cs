@@ -31,34 +31,35 @@ public class ChaosSpell : Spell
         return material;
     }
 
-    TWandAction[] Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
+    TWandAction[] Spell.UpdateSpell(TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
+        TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        if (triggerState.down)
+        if (rightTriggerState.down)
         {
             // check if wand is visible in the camera view
             Plane[] planes = GeometryUtility.CalculateFrustumPlanes(mainCamera);
-            Bounds wandBounds = new Bounds(wandPosition, new Vector3(0.1f, 0.1f, 0.1f));
+            Bounds wandBounds = new Bounds(rightControllerPosition, new Vector3(0.1f, 0.1f, 0.1f));
             if (!GeometryUtility.TestPlanesAABB(planes, wandBounds))
             {
-                potion = GameObject.Instantiate(potionPrefab) as GameObject;
+                potion = GameObject.Instantiate(potionPrefab, rightControllerPosition, new Quaternion(0f, 0f, 0f, 0f)) as GameObject;
             } 
             else
             {
                 potion = null;
             }
         }
-        else if (triggerState.press && potion != null)
+        else if (rightTriggerState.press && potion != null)
         {
-            potion.transform.position = wandPosition + wandDirection;
-            lastWandPosition = wandPosition;
+            potion.transform.position = rightControllerPosition + (rightControllerDirection * 0.1f);
+            lastWandPosition = rightControllerPosition;
         }
-        else if (triggerState.up && potion != null)
+        else if (rightTriggerState.up && potion != null)
         {
             Rigidbody potionRigibody = potion.gameObject.GetComponent<Rigidbody> ();
             // TODO Das hier verwendet die Geschwindigkeit der Hand, nicht der Potion (die ja vor der Hand schwebt).
             // Wäre es nicht intuitiver, hier die Potion-Positionen zu verwenden?
             // Außerdem könnte man dann schön aus dem Handgelenk werfen. :)
-            potionRigibody.velocity = Time.deltaTime * (wandPosition - lastWandPosition) * 18000f;
+            potionRigibody.velocity = Time.deltaTime * (rightControllerPosition - lastWandPosition) * 18000f;
             potionRigibody.constraints = RigidbodyConstraints.None;
             float torqueMultiplier = 100f;
             potionRigibody.AddTorque(

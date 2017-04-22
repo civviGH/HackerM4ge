@@ -21,16 +21,13 @@ public class MeteorSpell : Spell
         this.meteorPrefab = Resources.Load ("MeteorSpellPrefabs/Meteor2") as GameObject;
     }
 
-    TWandAction[] Spell.UpdateSpell (
-        TriggerState triggerState, 
-        Vector2 touchpadAxis, 
-        Vector3 wandPosition,
-        Vector3 wandDirection)
+    TWandAction[] Spell.UpdateSpell (TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
+        TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        if (triggerState.press) {
-            RightTriggerPress (wandPosition, wandDirection);
+        if (rightTriggerState.press) {
+            RightTriggerPress (rightControllerPosition, rightControllerDirection);
         }
-        if (triggerState.up) {
+        if (rightTriggerState.up) {
             RightTriggerUp ();
         }
 

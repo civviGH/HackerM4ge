@@ -10,10 +10,15 @@ public interface Spell
     string GetName();
 
     TWandAction[] UpdateSpell(
-        TriggerState triggerState,
-        Vector2 touchpadAxis,
-        Vector3 wandPosition,
-        Vector3 wandDirection
+        TriggerState rightTriggerState,
+        Vector2 rightTouchpadAxis,
+        Vector3 rightControllerPosition,
+        Vector3 rightControllerDirection,
+
+        TriggerState leftTriggerState,
+        Vector2 leftTouchpadAxis,
+        Vector3? leftControllerPosition,
+        Vector3? leftControllerDirection
     );
 
     TWandAction[] Select();

@@ -8,6 +8,7 @@ using SteamVRHelper;
 public class WandController : MonoBehaviour
 {
     public GameObject thumbnailPanel;
+    public GameObject leftControllerObject;
 
     private GameObject teleportLine;
     private GameObject highlightedPlatform;
@@ -25,7 +26,17 @@ public class WandController : MonoBehaviour
 
     // controller initalize
     // TODO This should be a method, not a property...
-    private SteamVR_Controller.Device controller { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
+    private SteamVR_Controller.Device rightController { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
+    private SteamVR_Controller.Device leftController { 
+        get {
+            var index = leftControllerObject.GetComponent<SteamVR_TrackedObject> ().index;
+            if (index == SteamVR_TrackedObject.EIndex.None) {
+                return null;
+            }
+            return SteamVR_Controller.Input((int)index);
+        }
+    }
+
 
     private ControllerType controllerType;
 
@@ -52,7 +63,7 @@ public class WandController : MonoBehaviour
         // Put material of spell on thumbnailpanel
         UpdateThumbnail();
 
-        controllerType = Helper.GetControllerType(controller);
+        controllerType = Helper.GetControllerType(rightController);
         //Debug.Log(string.Format("{0} Controller detected", Enum.GetName(typeof(ControllerType), controllerType)));
     }
 
@@ -67,7 +78,7 @@ public class WandController : MonoBehaviour
                 },
                 vibrate =>
                 {
-                    controller.TriggerHapticPulse(vibrate.microseconds);
+                    rightController.TriggerHapticPulse(vibrate.microseconds);
                     return Unit.Instance;
                 }
             );
@@ -79,23 +90,12 @@ public class WandController : MonoBehaviour
     {
         SpellSelect();
 
-        Vector3 normalizedDirection = Helper.WandDirection(transform, controllerType);
-        normalizedDirection.Normalize();
-        TWandAction[] wandActions = SelectedSpell().UpdateSpell(
-          new TriggerState(
-            controller.GetPressUp(triggerButton),
-            controller.GetPressDown(triggerButton),
-            controller.GetPress(triggerButton)
-          ),
-          controller.GetAxis(),
-          transform.position,
-          normalizedDirection
-        );
+        TWandAction[] wandActions = GetWandActions();
         ExecuteWandActions(wandActions);
 
-        lastFrameTouchpadDirection = Helper.GetDirectionOfTouchpad(controller);
+        lastFrameTouchpadDirection = Helper.GetDirectionOfTouchpad(rightController);
     }
-
+        
     private Spell SelectedSpell()
     {
         return listOfSpells[currentSpellIndex];
@@ -141,13 +141,13 @@ public class WandController : MonoBehaviour
 
     private bool SpellSelectNextDown()
     {
-        Direction direction = Helper.GetDirectionOfTouchpad(controller);
+        Direction direction = Helper.GetDirectionOfTouchpad(rightController);
         switch (controllerType)
         {
             case ControllerType.Oculus:
                 return lastFrameTouchpadDirection != direction && direction == Direction.right;
             case ControllerType.Vive:
-                return controller.GetPressDown(touchpad) && direction == Direction.right;
+                return rightController.GetPressDown(touchpad) && direction == Direction.right;
             default:
                 throw new NotImplementedException();
         }
@@ -155,16 +155,64 @@ public class WandController : MonoBehaviour
 
     private bool SpellSelectPreviousDown()
     {
-        Direction direction = Helper.GetDirectionOfTouchpad(controller);
+        Direction direction = Helper.GetDirectionOfTouchpad(rightController);
         switch (controllerType)
         {
             case ControllerType.Oculus:
                 return lastFrameTouchpadDirection != direction && direction == Direction.left;
             case ControllerType.Vive:
-                return controller.GetPressDown(touchpad) && direction == Direction.left;
+                return rightController.GetPressDown(touchpad) && direction == Direction.left;
             default:
                 throw new NotImplementedException();
         }
+    }
+
+    private TWandAction[] GetWandActions(){
+
+        Vector3 normalizedDirection = Helper.WandDirection(transform, controllerType);
+        normalizedDirection.Normalize();
+
+        if (leftController == null) {
+            return SelectedSpell().UpdateSpell(
+                new TriggerState(
+                    rightController.GetPressUp(triggerButton),
+                    rightController.GetPressDown(triggerButton),
+                    rightController.GetPress(triggerButton)
+                ),
+                rightController.GetAxis(),
+                transform.position,
+                normalizedDirection,
+                new TriggerState(
+                    false,
+                    false,
+                    false
+                ),
+                Vector2.zero,
+                null,
+                null
+            );
+
+        } else {
+            return SelectedSpell().UpdateSpell(
+                new TriggerState(
+                    rightController.GetPressUp(triggerButton),
+                    rightController.GetPressDown(triggerButton),
+                    rightController.GetPress(triggerButton)
+                ),
+                rightController.GetAxis(),
+                transform.position,
+                normalizedDirection,
+                new TriggerState(
+                    leftController.GetPressUp(triggerButton),
+                    leftController.GetPressDown(triggerButton),
+                    leftController.GetPress(triggerButton)
+                ),
+                leftController.GetAxis(),
+                leftControllerObject.transform.position,
+                Helper.WandDirection(leftControllerObject.transform, controllerType).normalized
+            );
+        }
+
     }
 
 }

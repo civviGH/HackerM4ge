@@ -21,6 +21,8 @@ public class SpellSelectComponent : MonoBehaviour {
     [Range(0.01f, 0.1f)]
     public float shrinkDiameterBy = 0.1f;
 
+    public Material spellSelectorMaterial;
+
     private SpellSelectState spellSelectState = SpellSelectState.Idle;
 
     public GameObject leftController;
@@ -138,8 +140,8 @@ public class SpellSelectComponent : MonoBehaviour {
     {
         castingRing = new GameObject();
         castingRing.AddComponent<Torus>();
-        Material material = Resources.Load<Material>("Materials/FireParticleFlameLickSheet");
-        castingRing.GetComponent<Renderer>().material = material;
+        //castingRing.GetComponent<Renderer>().material = spellSelectorMaterial;
+        castingRing.GetComponent<MeshRenderer>().material = spellSelectorMaterial;
 
         UpdateCasting();
     }

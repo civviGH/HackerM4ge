@@ -42,22 +42,23 @@ class LasertrapSpell : MonoBehaviour, Spell
         return laserBeamHazardMaterial;
     }
 
-    TWandAction[] Spell.UpdateSpell(TriggerState triggerState, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
+    TWandAction[] Spell.UpdateSpell(TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
+        TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        if (triggerState.press && trapTarget == null)
+        if (rightTriggerState.press && trapTarget == null)
         {
-            UpdateTrapSource(ref trapSource, touchpadAxis, wandPosition, wandDirection);
+            UpdateTrapSource(ref trapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
         }
-        else if (triggerState.press && trapTarget != null)
+        else if (rightTriggerState.press && trapTarget != null)
         {
-            UpdateTrapSource(ref trapTarget, touchpadAxis, wandPosition, wandDirection);
+            UpdateTrapSource(ref trapTarget, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
         }
 
-        if (triggerState.up && trapTarget == null)
+        if (rightTriggerState.up && trapTarget == null)
         {
             trapTarget = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
         }
-        else if (triggerState.up && trapTarget != null)
+        else if (rightTriggerState.up && trapTarget != null)
         {
             GameObject laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
             Destroy(trapSource, lifetime);
