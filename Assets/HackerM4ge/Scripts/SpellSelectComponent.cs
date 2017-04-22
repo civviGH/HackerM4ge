@@ -20,6 +20,9 @@ public class SpellSelectComponent : MonoBehaviour {
     public float minFinishCastingDistance = 0.6f;
     [Range(0.01f, 0.1f)]
     public float shrinkDiameterBy = 0.1f;
+    [Range(0.1f, 5f)]
+    public float castingRingFadeOutSeconds = 2f;
+
 
     public Material spellSelectorMaterial;
 
@@ -169,14 +172,29 @@ public class SpellSelectComponent : MonoBehaviour {
 
     private void FinishCasting()
     {
-        StartCoroutine(EndSelecting());
+        StartCoroutine(FadeOutCastingRing());
     }
 
-    IEnumerator EndSelecting()
+    IEnumerator FadeOutCastingRing()
     {
-        yield return new WaitForSeconds(2f);
+        // yield return new WaitForSeconds(2f);
+        float startTime = Time.time;
+        float now = Time.time;
+        float timePassed = now - startTime;
+
+        int colorId = Shader.PropertyToID("_TintColor");
+        float initialAlpha = this.GetComponent<Renderer>().material.GetColor(colorId).a;
+
+        while (timePassed < castingRingFadeOutSeconds)
+        {
+            var color = this.GetComponent<Renderer>().material.GetColor(colorId);
+            color.a = initialAlpha * (castingRingFadeOutSeconds - timePassed) / castingRingFadeOutSeconds;
+            this.GetComponent<Renderer>().material.SetColor(colorId, color);
+            yield return null;
+            now = Time.time;
+            timePassed = now - startTime;
+        }
         DestroyImmediate(castingRing);
-        spellSelectState = SpellSelectState.Idle;
     }
 
     private bool SelectButtonPressed(SteamVR_Controller.Device controller)
