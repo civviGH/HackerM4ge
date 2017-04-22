@@ -10,7 +10,6 @@ public class ChaosSpell : Spell
     private Camera mainCamera;
     private GameObject potion;
     Vector3 lastWandPosition;
-    int currentPositionIndex;
 
     public ChaosSpell()
     {
@@ -18,7 +17,6 @@ public class ChaosSpell : Spell
         material = Resources.Load("ChaosSpellThumbnailMaterial", typeof(Material)) as Material;
         mainCamera = Camera.main;
         lastWandPosition = new Vector3();
-        currentPositionIndex = 0;
     }
 
     public string GetName()

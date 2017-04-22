@@ -6,7 +6,7 @@ public class EnemyMovement : MonoBehaviour {
     private Enemy enemy;
     private NavMeshAgent nav;
     private Animator anim;
-    private List<Vector3> transforms;
+    private List<Vector3> positions;
     private int transformIndex;
 
     void Awake() {
@@ -16,31 +16,35 @@ public class EnemyMovement : MonoBehaviour {
 
     public void SetDestinations(Transform[] transforms)
     {
-        this.transforms = new List<Vector3>();
+        this.positions = new List<Vector3>();
         for (var i =0; i < transforms.Length; i++)
         {
-            this.transforms.Add(transforms[i].position);
+            this.positions.Add(transforms[i].position);
         }
         this.transformIndex = 0;
     }
 
     public void DetourTo(Vector3 transform)
     {
-        this.transforms.Insert(this.transformIndex, transform);
+        this.positions.Insert(this.transformIndex, transform);
     }
 
     // Update is called once per frame
     void Update() {
-        while ((transformIndex < this.transforms.Count) && (this.transforms[transformIndex] == null))
+        while ((transformIndex < this.positions.Count) && (this.positions[transformIndex] == null))
         {
             transformIndex++;
         }
-        if (transformIndex >= transforms.Count)
+        if (!nav.pathPending && nav.remainingDistance <= nav.stoppingDistance && (!nav.hasPath || nav.velocity.sqrMagnitude == 0f))
+        {
+            transformIndex++;
+        }
+        if (transformIndex >= positions.Count)
         {
             nav.enabled = false;
             return;
         }
-        nav.SetDestination(transforms[transformIndex]);
+        nav.SetDestination(positions[transformIndex]);
 
         if (nav.enabled && enemy != null && enemy.GetHealth() <= 0f)
         {
