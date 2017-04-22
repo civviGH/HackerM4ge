@@ -164,7 +164,9 @@ public class SpellSelectComponent : MonoBehaviour {
 
         for (int i = 0; i < listOfSpells.Count; i++) {
             float angle = 360 * i / listOfSpells.Count;
-            var position = castingRingTransform.position + castingRingTransform.forward.normalized * castingRingRadius;
+            var offset = castingRingTransform.forward.normalized * castingRingRadius;
+            Quaternion rotation = new Quaternion(castingRingTransform.up.x, castingRingTransform.up.y, castingRingTransform.up.z, angle);
+            var position = castingRingTransform.position + rotation * offset;
             var spellSelect = Instantiate(spellThumbnailPrefab, position, new Quaternion());
             spellSelect.GetComponent<Renderer>().material = listOfSpells[i].GetThumbnail();
         }
