@@ -82,7 +82,6 @@ public class Torus : MonoBehaviour
                 // Add the vertex to the vertex array
                 vertices[iv1] = new Vector3(x, y, z);
                 uv[iv1] = new Vector2((float)i / numSegments, (float)j / numTubes);
-                Debug.LogFormat("i = {0}, j = {1}, iv1 = {2}, v = {3}, uv = {4}", i, j, iv1, vertices[iv1], uv[iv1]);
 
                 if (n == 0 || m == 0)
                 {
