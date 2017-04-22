@@ -177,7 +177,6 @@ public class SpellSelectComponent : MonoBehaviour {
         castingRing.GetComponent<Torus>().numSegments = 32;
         castingRing.GetComponent<Torus>().numTubes = 12;
         castingRing.GetComponent<Renderer>().material = spellSelectorMaterial;
-        castingRing.GetComponent<Renderer>().material.mainTextureScale = new Vector2(30, 1);
 
         UpdateCasting();
 
