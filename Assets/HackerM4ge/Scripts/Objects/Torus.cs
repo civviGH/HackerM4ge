@@ -6,24 +6,34 @@
  */
 using UnityEngine;
 
-[RequireComponent(typeof(MeshFilter),typeof(MeshRenderer))]
-public class Torus : MonoBehaviour {
+[RequireComponent(typeof(MeshFilter), typeof(MeshRenderer))]
+public class Torus : MonoBehaviour
+{
 
-	public float segmentRadius = 1f;
-	public float tubeRadius = 0.1f;
-	public int numSegments = 32;
-	public int numTubes = 12;
+    public float segmentRadius = 1f;
+    public float tubeRadius = 0.1f;
+    public int numSegments = 32;
+    public int numTubes = 12;
 
-	void Start() {
-		RefreshTorus();
-	}
+    void Start()
+    {
+        RefreshTorus();
+    }
 
-    public void RefreshTorus() {
+    public void RefreshTorus()
+    {
+        // Calculate size of a segment and a tube
+        float segmentSize = 2 * Mathf.PI / (float)numSegments;
+        float tubeSize = 2 * Mathf.PI / (float)numTubes;
+
+        int numSegmentsPlusOne = numSegments + 1;
+        int numTubesPlusOne = numTubes + 1;
+
         // Total vertices
-        int totalVertices = numSegments * numTubes;
+        int totalVertices = numSegmentsPlusOne * numTubesPlusOne;
 
         // Total primitives
-        int totalPrimitives = totalVertices * 2;
+        int totalPrimitives = numSegments * numTubes * 2;
 
         // Total indices
         int totalIndices = totalPrimitives * 3;
@@ -33,29 +43,30 @@ public class Torus : MonoBehaviour {
 
         // Init the vertex and triangle arrays
         Vector3[] vertices = new Vector3[totalVertices];
+        Vector2[] uv = new Vector2[totalVertices];
         int[] triangleIndices = new int[totalIndices];
-
-        // Calculate size of a segment and a tube
-        float segmentSize = 2 * Mathf.PI / (float)numSegments;
-        float tubeSize = 2 * Mathf.PI / (float)numTubes;
 
         // Create floats for our xyz coordinates
         float x, y, z;
 
-   		// Begin loop that fills in both arrays
-        for (int i = 0; i < numSegments; i++)
+        int ti = 0;
+
+        // Begin loop that fills in both arrays
+        for (int i = 0; i < numSegmentsPlusOne; i++)
         {
             // Find next (or first) segment offset
-            int n = (i + 1) % numSegments; // changed segmentList.Count to numSegments
+            int n = (i + 1) % numSegmentsPlusOne; // changed segmentList.Count to numSegments
 
             // Find the current and next segments
-            int currentTubeOffset = i * numTubes;
-            int nextTubeOffset = n * numTubes;
+            int currentTubeOffset = i * numTubesPlusOne;
+            int nextTubeOffset = n * numTubesPlusOne;
 
-            for (int j = 0; j < numTubes; j++)
+            //int ti = i * numTubes;
+
+            for (int j = 0; j < numTubesPlusOne; j++)
             {
                 // Find next (or first) vertex offset
-                int m = (j + 1) % numTubes; // changed currentTube.Count to numTubes
+                int m = (j + 1) % numTubesPlusOne; // changed currentTube.Count to numTubes
 
                 // Find the 4 vertices that make up a quad
                 int iv1 = currentTubeOffset + j;
@@ -70,23 +81,30 @@ public class Torus : MonoBehaviour {
 
                 // Add the vertex to the vertex array
                 vertices[iv1] = new Vector3(x, y, z);
+                uv[iv1] = new Vector2((float)i / numSegments, (float)j / numTubes);
+                Debug.LogFormat("i = {0}, j = {1}, iv1 = {2}, v = {3}, uv = {4}", i, j, iv1, vertices[iv1], uv[iv1]);
 
-                // "Draw" the first triangle involving this vertex
-                triangleIndices[iv1 * 6] = iv1;
-                triangleIndices[iv1 * 6 + 1] = iv2;
-                triangleIndices[iv1 * 6 + 2] = iv3;
+                if (n == 0 || m == 0)
+                {
+                    continue;
+                }
+
+                triangleIndices[ti++] = iv1;
+                triangleIndices[ti++] = iv2;
+                triangleIndices[ti++] = iv3;
                 // Finish the quad
-                triangleIndices[iv1 * 6 + 3] = iv3;
-                triangleIndices[iv1 * 6 + 4] = iv4;
-                triangleIndices[iv1 * 6 + 5] = iv1;
+                triangleIndices[ti++] = iv3;
+                triangleIndices[ti++] = iv4;
+                triangleIndices[ti++] = iv1;
             }
         }
         mesh.vertices = vertices;
         mesh.triangles = triangleIndices;
+        mesh.uv = uv;
 
         mesh.RecalculateBounds();
         mesh.RecalculateNormals(); // added on suggestion of Eric5h5 & joaeba in the forum thread
-        ;
+
         MeshFilter mFilter = GetComponent<MeshFilter>(); // tweaked to Generic
         mFilter.mesh = mesh;
     }
