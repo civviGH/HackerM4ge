@@ -4,8 +4,7 @@ public class ChaosPotion : MonoBehaviour {
     LayerMask layerMask;
     public GameObject breakingSound;
     public GameObject breakingParticles;
-    public GameObject vaporParticles;
-    public GameObject shrapnelParticles;
+    public GameObject poisonFogParticles;
 
     void Start()
     {
@@ -29,12 +28,9 @@ public class ChaosPotion : MonoBehaviour {
             }
             breakingSound.transform.parent = null;
             breakingSound.GetComponent<AudioSource>().Play();
-
-            shrapnelParticles.transform.parent = null;
-            shrapnelParticles.GetComponent<ParticleSystem>().Play();
-
-            vaporParticles.transform.parent = null;
-            vaporParticles.GetComponent<ParticleSystem>().Play();
+          
+            poisonFogParticles.transform.parent = null;
+            poisonFogParticles.GetComponent<ParticleSystem>().Play();
 
             breakingParticles.transform.parent = null;
             breakingParticles.GetComponent<ParticleSystem>().Play();
