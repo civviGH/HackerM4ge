@@ -35,6 +35,8 @@ public class SpellSelectComponent : MonoBehaviour {
 
     private GameObject castingRing;
 
+    List<Spell> listOfSpells = new List<Spell>();
+
     private enum SpellSelectState
     {
         Idle = 0,
@@ -44,6 +46,10 @@ public class SpellSelectComponent : MonoBehaviour {
 
     void Start()
     {
+        listOfSpells.Add(new MeteorSpell());
+        listOfSpells.Add(new LasertrapSpell());
+        listOfSpells.Add(new ChaosSpell());
+
         thisControllerObject = GetComponent<SteamVR_TrackedObject>();
 
         leftControllerObject = leftController.GetComponent<SteamVR_TrackedObject>();
@@ -156,27 +162,19 @@ public class SpellSelectComponent : MonoBehaviour {
 
     private void InitSelecting(Transform castingRingTransform, float castingRingRadius)
     {
-        List<Spell> listOfSpells = new List<Spell>();
-        // Add spells to spellList
-        listOfSpells.Add(new MeteorSpell());
-        listOfSpells.Add(new LasertrapSpell());
-        listOfSpells.Add(new ChaosSpell());
-
         for (int i = 0; i < listOfSpells.Count; i++) {
             float angle = 360f * i / listOfSpells.Count;
-            var offset = castingRingTransform.forward.normalized * castingRingRadius;
+            Vector3 offset = castingRingTransform.forward.normalized * castingRingRadius;
             Quaternion rotation = Quaternion.AngleAxis(angle, castingRingTransform.up);
-            var position = castingRingTransform.position + rotation * offset;
-            var spellSelect = Instantiate (spellThumbnailPrefab, position, new Quaternion());
+            Vector3 position = castingRingTransform.position + rotation * offset;
+            GameObject spellSelect = Instantiate (spellThumbnailPrefab, position, new Quaternion());
             spellSelect.GetComponent<Renderer>().material = listOfSpells[i].GetThumbnail();
-            rotation = Quaternion.FromToRotation (castingRingTransform.forward , Vector3.up);
-            // spellSelect.transform.forward = Vector3.up;
+            // let icon face in the players direction
             spellSelect.transform.up = -castingRingTransform.up;
-            var spellEuler = spellSelect.transform.rotation.eulerAngles;
+            // align with the ground
+            Vector3 spellEuler = spellSelect.transform.rotation.eulerAngles;
             spellEuler.x = 90f;
-            spellSelect.transform.rotation = Quaternion.Euler (spellEuler);
-            Debug.Log("CRT: " + castingRingTransform.rotation);
-            Debug.Log ("CRT.up: " + castingRingTransform.up);
+            spellSelect.transform.rotation = Quaternion.Euler(spellEuler);
         }
     }
 
