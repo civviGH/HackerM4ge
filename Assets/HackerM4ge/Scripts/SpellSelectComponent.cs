@@ -14,8 +14,10 @@ public class SpellSelectComponent : MonoBehaviour {
     
     private const Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
 
-    private const float maxBeginCastingDistance = 0.2f;
-    private const float minFinishCastingDistance = 0.6f;
+    [Range(0.01f, 0.2f)]
+    public float maxBeginCastingDistance = 0.2f;
+    [Range(0.1f, 1f)]
+    public float minFinishCastingDistance = 0.6f;
 
     private SpellSelectState spellSelectState = SpellSelectState.Idle;
 
@@ -72,8 +74,8 @@ public class SpellSelectComponent : MonoBehaviour {
 
         // Size
         var distance = Vector3.Magnitude(thisControllerObject.transform.position - leftControllerObject.transform.position);
-        distance = Mathf.Max(distance, minFinishCastingDistance);
-        var radius = (distance - maxBeginCastingDistance / 2f) / 2f;
+        distance = Mathf.Min(distance, minFinishCastingDistance);
+        var radius = (distance) / 2f;
         castingRing.GetComponent<Torus>().segmentRadius = radius;
         castingRing.GetComponent<Torus>().tubeRadius = radius / 10f;
         // TODO maybe these need to be adjusted
