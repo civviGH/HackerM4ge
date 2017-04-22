@@ -14,14 +14,16 @@ public class SpellSelectComponent : MonoBehaviour {
     
     private const Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
 
-    [Range(0.01f, 0.2f)]
+    [Range(0.01f, 0.6f)]
     public float maxBeginCastingDistance = 0.2f;
     [Range(0.1f, 1f)]
     public float minFinishCastingDistance = 0.6f;
-    [Range(0.01f, 0.1f)]
+    [Range(0.01f, 0.4f)]
     public float shrinkDiameterBy = 0.1f;
     [Range(0.1f, 5f)]
     public float castingRingFadeOutSeconds = 2f;
+
+    public GameObject spellThumbnailPrefab;
 
 
     public Material spellSelectorMaterial;
@@ -162,9 +164,9 @@ public class SpellSelectComponent : MonoBehaviour {
 
         for (int i = 0; i < listOfSpells.Count; i++) {
             float angle = 360 * i / listOfSpells.Count;
-            var spellSelect = new GameObject();
+            var position = castingRingTransform.position + castingRingTransform.forward.normalized * castingRingRadius;
+            var spellSelect = Instantiate(spellThumbnailPrefab, position, new Quaternion());
             spellSelect.GetComponent<Renderer>().material = listOfSpells[i].GetThumbnail();
-            spellSelect.transform.position = castingRingTransform.position + castingRingTransform.forward.normalized * castingRingRadius;
         }
     }
 
