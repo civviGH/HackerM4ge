@@ -59,6 +59,7 @@ public class ChaosSpell : Spell
             // Wäre es nicht intuitiver, hier die Potion-Positionen zu verwenden?
             // Außerdem könnte man dann schön aus dem Handgelenk werfen. :)
             potionRigibody.velocity = Time.deltaTime * (wandPosition - lastWandPosition) * 18000f;
+            potionRigibody.constraints = RigidbodyConstraints.None;
             float torqueMultiplier = 100f;
             potionRigibody.AddTorque(
                 UnityEngine.Random.Range(-torqueMultiplier, torqueMultiplier),
