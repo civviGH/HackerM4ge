@@ -65,6 +65,11 @@ public class SpellSelectComponent : MonoBehaviour {
         UpdateVisualization();
     }
 
+    void OnTriggerEnter(Collider collider)
+    {
+        Debug.Log("SpellSelectComponent's controller collided with" + collider.gameObject.name);
+    }
+
     private void UpdateVisualization()
     {
         switch (spellSelectState)
