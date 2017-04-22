@@ -2,12 +2,13 @@ using System.Collections;
 using UnityEngine;
 
 public class EnemyManager : MonoBehaviour {
-    public float spawnTime = 3f;
+    public float spawnDelay = 3f;
+    public float timeBetweenSpawns = 2f;
     public Transform[] spawners;
     public Transform[] homeNetworks;
     
 	void Start () {
-        InvokeRepeating("Spawn", spawnTime, spawnTime); // delay of spawn time and interval of spawn time
+        InvokeRepeating("Spawn", spawnDelay, timeBetweenSpawns); // delay of spawn time and interval of spawn time
 	}
 
     void Spawn() {

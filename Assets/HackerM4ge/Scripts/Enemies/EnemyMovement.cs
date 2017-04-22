@@ -31,24 +31,30 @@ public class EnemyMovement : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        while ((transformIndex < this.positions.Count) && (this.positions[transformIndex] == null))
-        {
-            transformIndex++;
-        }
-        if (!nav.pathPending && nav.remainingDistance <= nav.stoppingDistance && (!nav.hasPath || nav.velocity.sqrMagnitude == 0f))
-        {
-            transformIndex++;
-        }
-        if (transformIndex >= positions.Count)
-        {
-            nav.enabled = false;
-            return;
-        }
-        nav.SetDestination(positions[transformIndex]);
+        if (nav.isActiveAndEnabled) {
+            while ((transformIndex < this.positions.Count) && (this.positions [transformIndex] == null)) {
+                transformIndex++;
+            }
 
-        if (nav.enabled && enemy != null && enemy.GetHealth() <= 0f)
-        {
-            anim.SetTrigger("Dead");
+            if (!nav.pathPending && nav.remainingDistance <= nav.stoppingDistance && (!nav.hasPath || nav.velocity.sqrMagnitude == 0f)) {
+                transformIndex++;
+            }
+            if (transformIndex >= positions.Count) {
+                nav.enabled = false;
+                return;
+            }
+            while (positions [transformIndex] == null) {
+                transformIndex++;
+                if (transformIndex >= positions.Count) {
+                    nav.enabled = false;
+                    return;
+                }
+            }
+
+                nav.SetDestination (positions [transformIndex]);
+            if (enemy != null && enemy.GetHealth () <= 0f) {
+                anim.SetTrigger ("Dead");
+            }
         }
     }
 
