@@ -6,7 +6,7 @@ public class EnemyMovement : MonoBehaviour {
     private Enemy enemy;
     private NavMeshAgent nav;
     private Animator anim;
-    private List<Transform> transforms;
+    private List<Vector3> transforms;
     private int transformIndex;
 
     void Awake() {
@@ -16,15 +16,15 @@ public class EnemyMovement : MonoBehaviour {
 
     public void SetDestinations(Transform[] transforms)
     {
-        this.transforms = new List<Transform>();
+        this.transforms = new List<Vector3>();
         for (var i =0; i < transforms.Length; i++)
         {
-            this.transforms.Add(transforms[i]);
+            this.transforms.Add(transforms[i].position);
         }
         this.transformIndex = 0;
     }
 
-    public void DetourTo(Transform transform)
+    public void DetourTo(Vector3 transform)
     {
         this.transforms.Insert(this.transformIndex, transform);
     }
@@ -40,7 +40,7 @@ public class EnemyMovement : MonoBehaviour {
             nav.enabled = false;
             return;
         }
-        nav.SetDestination(transforms[transformIndex].position);
+        nav.SetDestination(transforms[transformIndex]);
 
         if (nav.enabled && enemy != null && enemy.GetHealth() <= 0f)
         {

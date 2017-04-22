@@ -24,9 +24,7 @@ public class ChaosPotion : MonoBehaviour {
             foreach (Collider damagedEnemy in damagedEnemies)
             {
                 Enemy enemy = damagedEnemy.transform.gameObject.GetComponent<Enemy>();
-                var transform = damagedEnemy.transform;
-                transform.position += new Vector3(Random.Range(-5, 5), 0, Random.Range(-5, 5));
-                enemy.movement.DetourTo(transform);
+                enemy.movement.DetourTo(damagedEnemy.transform.position + new Vector3(Random.Range(-5, 5), 0, Random.Range(-5, 5)));
             }
             breakingSound.transform.parent = null;
             breakingSound.GetComponent<AudioSource>().Play();
@@ -37,6 +35,9 @@ public class ChaosPotion : MonoBehaviour {
             breakingParticles.transform.parent = null;
             breakingParticles.GetComponent<ParticleSystem>().Play();
 
+            Destroy(breakingSound, 0.5f);
+            Destroy(breakingParticles, 2f);
+            Destroy(poisonFogParticles, 2f);
             Destroy(gameObject);
         }
     }
