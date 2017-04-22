@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class HomeNetworkScript : MonoBehaviour
 {
+    public GameObject HealthManagerObject;
     private HealthManagerScript healthManager;
     private AudioSource damageSoundSource;
 
@@ -14,7 +15,7 @@ public class HomeNetworkScript : MonoBehaviour
     {
         this.damageSoundSource = gameObject.GetComponent<AudioSource> ();
 
-        this.healthManager = GameObject.Find ("HealthManager").GetComponent<HealthManagerScript> ();
+        this.healthManager = HealthManagerObject.GetComponent<HealthManagerScript> ();
         this.healthManager.RegisterNetwork (gameObject);
     }
 	
