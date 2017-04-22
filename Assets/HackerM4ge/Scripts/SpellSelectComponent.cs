@@ -1,9 +1,9 @@
 ﻿using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 using SteamVRHelper;
 using System;
+using System.Collections.Generic;
 
 public class SpellSelectComponent : MonoBehaviour {
     private SteamVR_TrackedObject thisControllerObject;
@@ -86,9 +86,7 @@ public class SpellSelectComponent : MonoBehaviour {
         var radius = (distance - shrinkDiameterBy) / 2f;
         castingRing.GetComponent<Torus>().segmentRadius = radius;
         castingRing.GetComponent<Torus>().tubeRadius = radius / 10f;
-        // TODO maybe these need to be adjusted
-        castingRing.GetComponent<Torus>().numSegments = 32;
-        castingRing.GetComponent<Torus>().numTubes = 12;
+
         castingRing.GetComponent<Torus>().RefreshTorus();
 
         // Orientation
@@ -137,6 +135,7 @@ public class SpellSelectComponent : MonoBehaviour {
                     if (Distance(thisControllerObject, leftControllerObject) > minFinishCastingDistance)
                     {
                         spellSelectState = SpellSelectState.Selecting;
+                        InitSelecting(castingRing.transform, castingRing.GetComponent<Torus>().segmentRadius);
                         FinishCasting();
                     }
                     else
@@ -153,10 +152,28 @@ public class SpellSelectComponent : MonoBehaviour {
         }
     }
 
+    private void InitSelecting(Transform castingRingTransform, float castingRingRadius)
+    {
+        List<Spell> listOfSpells = new List<Spell>();
+        // Add spells to spellList
+        listOfSpells.Add(new MeteorSpell());
+        listOfSpells.Add(new LasertrapSpell());
+        listOfSpells.Add(new ChaosSpell());
+
+        for (int i = 0; i < listOfSpells.Count; i++) {
+            float angle = 360 * i / listOfSpells.Count;
+            var spellSelect = new GameObject();
+            spellSelect.GetComponent<Renderer>().material = listOfSpells[i].GetThumbnail();
+            spellSelect.transform.position = castingRingTransform.position + castingRingTransform.forward.normalized * castingRingRadius;
+        }
+    }
+
     private void InitCasting()
     {
         castingRing = new GameObject();
         castingRing.AddComponent<Torus>();
+        castingRing.GetComponent<Torus>().numSegments = 32;
+        castingRing.GetComponent<Torus>().numTubes = 12;
         castingRing.GetComponent<Renderer>().material = spellSelectorMaterial;
         castingRing.GetComponent<Renderer>().material.mainTextureScale = new Vector2(30, 1);
 
