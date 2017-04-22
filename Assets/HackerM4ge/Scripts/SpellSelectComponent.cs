@@ -93,6 +93,9 @@ public class SpellSelectComponent : MonoBehaviour {
         direction.y = 0;
         direction.Normalize();
         castingRing.transform.up = direction;
+
+        // Rotate
+        castingRing.transform.Rotate(Vector3.up * Time.deltaTime * 10);
     }
 
     private void UpdateSpellSelectState()
@@ -140,8 +143,8 @@ public class SpellSelectComponent : MonoBehaviour {
     {
         castingRing = new GameObject();
         castingRing.AddComponent<Torus>();
-        //castingRing.GetComponent<Renderer>().material = spellSelectorMaterial;
-        castingRing.GetComponent<MeshRenderer>().material = spellSelectorMaterial;
+        castingRing.GetComponent<Renderer>().material = spellSelectorMaterial;
+        castingRing.GetComponent<Renderer>().material.mainTextureScale = new Vector2(30, 1);
 
         UpdateCasting();
     }
