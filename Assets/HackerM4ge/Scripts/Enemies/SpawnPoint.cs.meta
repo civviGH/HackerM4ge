@@ -1,10 +1,14 @@
 fileFormatVersion: 2
 guid: 5a8e44321efd0eb41bebf116993ad656
-timeCreated: 1487427064
+timeCreated: 1492860165
 licenseType: Free
 MonoImporter:
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - spiderPrefab: {fileID: 1586874374900450, guid: e5b69208bbea26646ac80d3fbe5077a4,
+      type: 2}
+  - virusPrefab: {fileID: 1495897181951070, guid: a9623e9c46921de45b5ffe4ca8ff8628,
+      type: 2}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
