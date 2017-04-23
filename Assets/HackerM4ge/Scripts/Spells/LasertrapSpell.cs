@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
@@ -9,20 +8,18 @@ class LasertrapSpell : MonoBehaviour, Spell
     const float maxSpeed = 15f;
     const float lifetime = 20f;
 
-    private UnityEngine.Object laserSourcePrefab;
+    private GameObject laserSourcePrefab;
     private Material laserBeamHazardMaterial;
     private LayerMask surfaceLayer;
 
     private GameObject rightHandTrapSource;
     private GameObject leftHandTrapSource;
-    private float trapSourceDistance;
 
     private bool rightHandTrapSourcePlaced;
     private bool leftHandTrapSourcePlaced;
 
     /*
      * TODO:
-     * - Eine Source pro Controller setzen
      * - Nach dem Setzen nicht direkt den Laser einschalten, sondern Traps erst noch "werfen"
      * - Trap-Positionen beim Setzen besser sichtbar machen: Strahl in den Himmel z.B.?
      * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
@@ -31,17 +28,15 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     public LasertrapSpell()
     {
-        laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
+        laserSourcePrefab = Resources.Load<GameObject>("LaserTrapSpellPrefabs/LaserSource");
         laserBeamHazardMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/LaserBeamHazard");
         surfaceLayer = LayerMask.GetMask("Surfaces");
-
-        trapSourceDistance = minimalDistance;
     }
 
     private void Init()
     {
-        rightHandTrapSource = Instantiate(laserSourcePrefab) as GameObject;
-        leftHandTrapSource = Instantiate(laserSourcePrefab) as GameObject;
+        rightHandTrapSource = Instantiate(laserSourcePrefab);
+        leftHandTrapSource = Instantiate(laserSourcePrefab);
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
     }
@@ -60,14 +55,17 @@ class LasertrapSpell : MonoBehaviour, Spell
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
         // right controller
-        UpdateTrapSource(ref rightHandTrapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
-        if (rightTriggerState.down && !rightHandTrapSourcePlaced && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
+        if (!rightHandTrapSourcePlaced)
         {
-            rightHandTrapSourcePlaced = true;
+            UpdateTrapSource(ref rightHandTrapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
+            if (rightTriggerState.down && !rightHandTrapSourcePlaced && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
+            {
+                rightHandTrapSourcePlaced = true;
+            }
         }
 
         // left controller
-        if (leftControllerPosition != null && leftControllerDirection != null)
+        if (!leftHandTrapSourcePlaced && leftControllerPosition != null && leftControllerDirection != null)
         {
             UpdateTrapSource(ref leftHandTrapSource, leftTouchpadAxis, leftControllerPosition.Value, leftControllerDirection.Value);
             if (leftTriggerState.down && !leftHandTrapSourcePlaced && NextSurfacePosition(leftControllerPosition.Value, leftControllerDirection.Value) != null)
@@ -114,7 +112,7 @@ class LasertrapSpell : MonoBehaviour, Spell
         RaycastHit hitObject;
         Ray ray = new Ray(wandPosition, wandDirection);
 
-        if (! Physics.Raycast(ray, out hitObject, Mathf.Infinity, surfaceLayer))
+        if (!Physics.Raycast(ray, out hitObject, Mathf.Infinity, surfaceLayer))
         {
             return null;
         }
