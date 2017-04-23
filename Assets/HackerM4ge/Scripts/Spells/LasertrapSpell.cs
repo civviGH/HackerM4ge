@@ -30,8 +30,9 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     public LasertrapSpell()
     {
-        laserSourcePrefab = Resources.Load<GameObject>("LaserTrapSpellPrefabs/LaserSource");
-        laserSourceMaterial = laserSourcePrefab.GetComponent<MeshRenderer>().materials[1];
+        laserSourcePrefab = Resources.Load<GameObject>("LaserTrapSpellPrefabs/LaserSourcePrefab");
+        laserSourceMaterial = laserSourcePrefab.GetComponent<MeshRenderer>().sharedMaterials[0];
+        laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/laserSourceBlueprintMaterial");
         laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/laserSourceBlueprintMaterial");
         laserBeamHazardMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/LaserBeamHazard");
         surfaceLayer = LayerMask.GetMask("Surfaces");
@@ -41,8 +42,8 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         rightHandTrapSource = Instantiate(laserSourcePrefab);
         leftHandTrapSource = Instantiate(laserSourcePrefab);
-        rightHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
-        leftHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
+        rightHandTrapSource.GetComponent<MeshRenderer>().material = laserSourceBlueprintMaterial;
+        leftHandTrapSource.GetComponent<MeshRenderer>().material = laserSourceBlueprintMaterial;
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
     }
