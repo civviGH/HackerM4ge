@@ -23,6 +23,8 @@ class LasertrapSpell : MonoBehaviour, Spell
      * - Nach dem Setzen nicht direkt den Laser einschalten, sondern Traps erst noch "werfen"
      * - Trap-Positionen beim Setzen besser sichtbar machen: Strahl in den Himmel z.B.?
      * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
+     * - Traps sollten nicht in der Luft (d.h. vor dem Controller) platziert werden können
+     * - Traps während das Platzierens, d.h. vor dem "werfen", halb-transparent machen
      */
 
     public LasertrapSpell()
@@ -87,22 +89,28 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void UpdateTrapSourcePosition(ref GameObject trapSource, Vector3 wandPosition, Vector3 wandDirection)
     {
-        RaycastHit hitObject;
-        Ray ray = new Ray(wandPosition, wandDirection);
-
-        float currentDistance;
-        if (Physics.Raycast(ray, out hitObject, Mathf.Infinity, surfaceLayer))
+        Vector3? surfacePosition = NextSurfacePosition(wandPosition, wandDirection);
+        if (surfacePosition != null)
         {
-            currentDistance = hitObject.distance - 0.5f;
+            trapSource.transform.position = surfacePosition.Value + Vector3.up * 0.3f;
         }
         else
         {
-            currentDistance = minimalDistance;
+            trapSource.transform.position = wandPosition + wandDirection * minimalDistance;
+        }
+    }
+
+    private Vector3? NextSurfacePosition(Vector3 wandPosition, Vector3 wandDirection)
+    {
+        RaycastHit hitObject;
+        Ray ray = new Ray(wandPosition, wandDirection);
+
+        if (! Physics.Raycast(ray, out hitObject, Mathf.Infinity, surfaceLayer))
+        {
+            return null;
         }
 
-        // TODO statt die source 0.5f richtung spieler zu verschieben sollte die position 0.5f (oder so) vom boden nach oben gesetzt werden.
-
-        trapSource.transform.position = wandPosition + wandDirection * currentDistance;
+        return wandPosition + wandDirection * hitObject.distance;
     }
 
     private static GameObject CreateLaser(Vector3 from, Vector3 to)
