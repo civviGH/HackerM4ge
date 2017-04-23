@@ -25,7 +25,6 @@ class LasertrapSpell : MonoBehaviour, Spell
      * - Nach dem Setzen nicht direkt den Laser einschalten, sondern Traps erst noch "werfen"
      * - Trap-Positionen beim Setzen besser sichtbar machen: Strahl in den Himmel z.B.?
      * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
-     * - Traps während das Platzierens, d.h. vor dem "werfen", halb-transparent machen
      */
 
     public LasertrapSpell()
