@@ -15,7 +15,9 @@ public class KeySummonerSerial : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
+        //Debug.Log ("showing: " + showing);
         Vector3 delta = Camera.main.transform.position - transform.position;
+        //Debug.Log ("Delta.m: " + delta.magnitude);
         if (delta.magnitude < minDistance)
         {
             if (showing) return;
@@ -26,13 +28,14 @@ public class KeySummonerSerial : MonoBehaviour {
             if (!showing) return;
             showing = false;
         }
-        animateKeys(showing);
+        StartCoroutine(animateKeys(showing));
     }
 
-    private IEnumerable animateKeys(bool state)
+    private IEnumerator animateKeys(bool state)
     {
         for(int i = 0; i < children.Length; i++)
         {
+            Debug.LogFormat ("Time: " + Time.fixedTime + " | i:  " + i + " | " + state);
             children[i].SetBool("Shown", state);
             yield return new WaitForSeconds(delay);
         }
