@@ -17,6 +17,14 @@ class LasertrapSpell : MonoBehaviour, Spell
     private GameObject trapTarget;
     private float trapSourceDistance;
 
+    /*
+     * TODO:
+     * - Eine Source pro Controller setzen
+     * - Nach dem Setzen nicht direkt den Laser einschalten, sondern Traps erst noch "werfen"
+     * - Trap-Positionen beim Setzen besser sichtbar machen: Strahl in den Himmel z.B.?
+     * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
+     */
+
     public LasertrapSpell()
     {
         laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
