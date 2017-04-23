@@ -43,10 +43,9 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         rightHandTrapSource = Instantiate(laserSourcePrefab);
         leftHandTrapSource = Instantiate(laserSourcePrefab);
-        rightHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceBlueprintMaterial;
-        leftHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceBlueprintMaterial;
-        rightHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
-        leftHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
+        Material[] materials = { laserSourceBlueprintMaterial, laserSourceBlueprintMaterial };
+        rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
+        leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
     }
@@ -88,10 +87,9 @@ class LasertrapSpell : MonoBehaviour, Spell
         if (rightHandTrapSourcePlaced && leftHandTrapSourcePlaced)
         {
             GameObject laser = CreateLaser(rightHandTrapSource.transform.position, leftHandTrapSource.transform.position);
-            rightHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceMaterial;
-            leftHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceMaterial;
-            rightHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceMaterial;
-            leftHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceMaterial;
+            Material[] materials = { laserSourceMaterial, laserSourceMaterial };
+            rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
+            leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
             Destroy(rightHandTrapSource, lifetime);
             Destroy(leftHandTrapSource, lifetime);
             Destroy(laser, lifetime);
