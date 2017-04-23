@@ -20,7 +20,7 @@ class LasertrapSpell : MonoBehaviour, Spell
     public LasertrapSpell()
     {
         laserSourcePrefab = Resources.Load("LaserTrapSpellPrefabs/LaserSource");
-        laserBeamHazardMaterial = Resources.Load("LaserTrapSpellPrefabs/LaserBeamHazard", typeof(Material)) as Material;
+        laserBeamHazardMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/LaserBeamHazard");
         surfaceLayer = LayerMask.GetMask("Surfaces");
 
         trapSourceDistance = minimalDistance;
@@ -45,20 +45,20 @@ class LasertrapSpell : MonoBehaviour, Spell
     TWandAction[] Spell.UpdateSpell(TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        if (rightTriggerState.press && trapTarget == null)
+        if (trapTarget == null)
         {
             UpdateTrapSource(ref trapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
         }
-        else if (rightTriggerState.press && trapTarget != null)
+        else if (trapTarget != null)
         {
             UpdateTrapSource(ref trapTarget, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
         }
 
-        if (rightTriggerState.up && trapTarget == null)
+        if (rightTriggerState.down && trapTarget == null)
         {
             trapTarget = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
         }
-        else if (rightTriggerState.up && trapTarget != null)
+        else if (rightTriggerState.down && trapTarget != null)
         {
             GameObject laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
             Destroy(trapSource, lifetime);
@@ -74,25 +74,25 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void UpdateTrapSource(ref GameObject trapSource, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
     {
-        float distance = Math.Sign(touchpadAxis.y) * touchpadAxis.y * touchpadAxis.y * Time.deltaTime * maxSpeed;
-        trapSourceDistance += distance;
-        if(trapSourceDistance < minimalDistance)
-        {
-            trapSourceDistance = minimalDistance;
-        }
-        UpdateTrapSourcePosition(ref trapSource, trapSourceDistance, wandPosition, wandDirection);
+        UpdateTrapSourcePosition(ref trapSource, wandPosition, wandDirection);
     }
 
-    private void UpdateTrapSourcePosition(ref GameObject trapSource, float trapSourceDistance, Vector3 wandPosition, Vector3 wandDirection)
+    private void UpdateTrapSourcePosition(ref GameObject trapSource, Vector3 wandPosition, Vector3 wandDirection)
     {
         RaycastHit hitObject;
         Ray ray = new Ray(wandPosition, wandDirection);
 
-        float currentDistance = trapSourceDistance;
-        if (Physics.Raycast(ray, out hitObject, trapSourceDistance, surfaceLayer))
+        float currentDistance;
+        if (Physics.Raycast(ray, out hitObject, Mathf.Infinity, surfaceLayer))
         {
-            currentDistance = Math.Max(hitObject.distance - 0.5f, minimalDistance);
+            currentDistance = hitObject.distance - 0.5f;
         }
+        else
+        {
+            currentDistance = minimalDistance;
+        }
+
+        // TODO statt die source 0.5f richtung spieler zu verschieben sollte die position 0.5f (oder so) vom boden nach oben gesetzt werden.
 
         trapSource.transform.position = wandPosition + wandDirection * currentDistance;
     }
