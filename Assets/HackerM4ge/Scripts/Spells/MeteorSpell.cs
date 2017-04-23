@@ -64,9 +64,14 @@ public class MeteorSpell : Spell
         case SpellSelectState.Dragging:
             if (!rightTriggerState.press && !leftTriggerState.press) {
                 float draggingEndPosition = (rightControllerPosition.y + leftControllerPosition.Value.y) / 2f;
-                float dragLength = draggingStartPosition - draggingEndPosition;
+                float dragLength = Mathf.Max(draggingStartPosition - draggingEndPosition, 0f);
                 spellSelectState = SpellSelectState.Aiming;
-                meteorToDragScript.StartFalling ();
+                if (dragLength <= 0.1f) {
+                    meteorToDragScript.DestroyMeteor ();
+                } else {
+                    meteorToDragScript.SetSpeed (dragLength * 25f);
+                    meteorToDragScript.StartFalling ();
+                }
             }
             break;
         }
