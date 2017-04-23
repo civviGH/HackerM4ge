@@ -36,6 +36,8 @@ public class KeySummonerSerial : MonoBehaviour {
         for (int i = 0; i < children.Length; i++)
         {
             children[i].SetBool("Shown", true);
+            var anim = children[i].GetComponent<Animator>();
+            anim.Update(delay);
             yield return new WaitForSeconds(delay);
         }
     }
@@ -46,6 +48,8 @@ public class KeySummonerSerial : MonoBehaviour {
         for (int i = 0; i < children.Length; i++)
         {
             children[i].SetBool("Shown", false);
+            var anim = children[i].GetComponent<Animator>();
+            anim.Update(delay);
             yield return new WaitForSeconds(delay);
         }
     }
