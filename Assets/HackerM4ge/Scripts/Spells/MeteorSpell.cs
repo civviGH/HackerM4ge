@@ -17,7 +17,7 @@ public class MeteorSpell : Spell
 
     private float draggingStartPosition;
 
-    private GameObject meteorToDrag;
+    private MeteorController meteorToDragScript;
 
     private enum SpellSelectState
     {
@@ -47,14 +47,14 @@ public class MeteorSpell : Spell
             }            
             if (this.previewSphere && rightTriggerState.up) {
                 spellSelectState = SpellSelectState.MeteorSpawned;
-                meteorToDrag = SpawnMeteorToPosition (previewSphere.transform.position);
+                meteorToDragScript = SpawnMeteorToPosition (previewSphere.transform.position).GetComponent<MeteorController>();
             }
             break;
 
         case SpellSelectState.MeteorSpawned:
             if (rightTriggerState.press && leftTriggerState.press) {
                 spellSelectState = SpellSelectState.Dragging;
-                meteorToDrag.GetComponent<MeteorController> ().SetTargetArea (previewSphere.transform.position);
+                meteorToDragScript.SetTargetArea (previewSphere.transform.position);
                 UnityEngine.Object.Destroy (this.previewSphere);
                 //TODO check ob linker controller ueberhaupt da ist
                 draggingStartPosition = (rightControllerPosition.y + leftControllerPosition.Value.y) / 2f;
@@ -66,7 +66,7 @@ public class MeteorSpell : Spell
                 float draggingEndPosition = (rightControllerPosition.y + leftControllerPosition.Value.y) / 2f;
                 float dragLength = draggingStartPosition - draggingEndPosition;
                 spellSelectState = SpellSelectState.Aiming;
-                meteorToDrag.GetComponent<MeteorController> ().StartFalling ();
+                meteorToDragScript.StartFalling ();
             }
             break;
         }
