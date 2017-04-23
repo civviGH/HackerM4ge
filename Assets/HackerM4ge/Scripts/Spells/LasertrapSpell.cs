@@ -32,8 +32,8 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         laserSourcePrefab = Resources.Load<GameObject>("LaserTrapSpellPrefabs/LaserSourcePrefab");
         laserSourceMaterial = laserSourcePrefab.GetComponent<MeshRenderer>().sharedMaterials[0];
-        laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/laserSourceBlueprintMaterial");
-        laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/laserSourceBlueprintMaterial");
+        laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/Materials/laserSourceBlueprintMaterial");
+        laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/Materials/laserSourceBlueprintMaterial");
         laserBeamHazardMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/LaserBeamHazard");
         surfaceLayer = LayerMask.GetMask("Surfaces");
     }
