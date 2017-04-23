@@ -13,9 +13,12 @@ class LasertrapSpell : MonoBehaviour, Spell
     private Material laserBeamHazardMaterial;
     private LayerMask surfaceLayer;
 
-    private GameObject trapSource;
-    private GameObject trapTarget;
+    private GameObject rightHandTrapSource;
+    private GameObject leftHandTrapSource;
     private float trapSourceDistance;
+
+    private bool rightHandTrapSourcePlaced;
+    private bool leftHandTrapSourcePlaced;
 
     /*
      * TODO:
@@ -37,8 +40,10 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void Init()
     {
-        trapSource = Instantiate(laserSourcePrefab) as GameObject;
-        trapTarget = null;
+        rightHandTrapSource = Instantiate(laserSourcePrefab) as GameObject;
+        leftHandTrapSource = Instantiate(laserSourcePrefab) as GameObject;
+        rightHandTrapSourcePlaced = false;
+        leftHandTrapSourcePlaced = false;
     }
 
     string Spell.GetName()
@@ -54,24 +59,29 @@ class LasertrapSpell : MonoBehaviour, Spell
     TWandAction[] Spell.UpdateSpell(TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        if (trapTarget == null)
+        // right controller
+        UpdateTrapSource(ref rightHandTrapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
+        if (rightTriggerState.down && !rightHandTrapSourcePlaced && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
         {
-            UpdateTrapSource(ref trapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
-        }
-        else if (trapTarget != null)
-        {
-            UpdateTrapSource(ref trapTarget, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
+            rightHandTrapSourcePlaced = true;
         }
 
-        if (rightTriggerState.down && trapTarget == null && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
+        // left controller
+        if (leftControllerPosition != null && leftControllerDirection != null)
         {
-            trapTarget = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
+            UpdateTrapSource(ref leftHandTrapSource, leftTouchpadAxis, leftControllerPosition.Value, leftControllerDirection.Value);
+            if (leftTriggerState.down && !leftHandTrapSourcePlaced && NextSurfacePosition(leftControllerPosition.Value, leftControllerDirection.Value) != null)
+            {
+                leftHandTrapSourcePlaced = true;
+            }
         }
-        else if (rightTriggerState.down && trapTarget != null && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
+
+        // when both are placed, finish and reset
+        if (rightHandTrapSourcePlaced && leftHandTrapSourcePlaced)
         {
-            GameObject laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
-            Destroy(trapSource, lifetime);
-            Destroy(trapTarget, lifetime);
+            GameObject laser = CreateLaser(rightHandTrapSource.transform.position, leftHandTrapSource.transform.position);
+            Destroy(rightHandTrapSource, lifetime);
+            Destroy(leftHandTrapSource, lifetime);
             Destroy(laser, lifetime);
 
             Init();
@@ -143,10 +153,10 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     TWandAction[] Spell.Deselect()
     {
-        Destroy(trapSource);
-        Destroy(trapTarget);
-        trapSource = null;
-        trapTarget = null;
+        Destroy(rightHandTrapSource);
+        Destroy(leftHandTrapSource);
+        rightHandTrapSource = null;
+        leftHandTrapSource = null;
 
         TWandAction[] actions = { };
         return actions;
