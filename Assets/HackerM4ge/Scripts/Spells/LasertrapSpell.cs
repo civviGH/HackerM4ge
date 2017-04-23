@@ -23,7 +23,6 @@ class LasertrapSpell : MonoBehaviour, Spell
      * - Nach dem Setzen nicht direkt den Laser einschalten, sondern Traps erst noch "werfen"
      * - Trap-Positionen beim Setzen besser sichtbar machen: Strahl in den Himmel z.B.?
      * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
-     * - Traps sollten nicht in der Luft (d.h. vor dem Controller) platziert werden können
      * - Traps während das Platzierens, d.h. vor dem "werfen", halb-transparent machen
      */
 
@@ -64,11 +63,11 @@ class LasertrapSpell : MonoBehaviour, Spell
             UpdateTrapSource(ref trapTarget, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
         }
 
-        if (rightTriggerState.down && trapTarget == null)
+        if (rightTriggerState.down && trapTarget == null && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
         {
             trapTarget = Instantiate(Resources.Load("LaserTrapSpellPrefabs/LaserSource")) as GameObject;
         }
-        else if (rightTriggerState.down && trapTarget != null)
+        else if (rightTriggerState.down && trapTarget != null && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
         {
             GameObject laser = CreateLaser(trapSource.transform.position, trapTarget.transform.position);
             Destroy(trapSource, lifetime);
