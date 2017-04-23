@@ -37,9 +37,8 @@ public class KeySummonerSerial : MonoBehaviour {
         {
             children[i].SetBool("Shown", state);
             var anim = children[i].GetComponent<Animator>();
-            anim.speed = 1.0f;
-            anim.Update(delay);
-            anim.speed = 0.0f;
+            anim.speed = 0.01f;
+            anim.Update(0.01f);
             yield return new WaitForSeconds(delay);
         }
     }
