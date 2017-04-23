@@ -14,13 +14,19 @@ public class MeteorController : MonoBehaviour
     public GameObject explosionParticleObject;
     public GameObject fireShrapnelObject;
 
+    private Vector3 targetArea;
+
     public MeteorController ()
     {
     }
 
-    public void StartFalling (Vector3 targetPosition)
+    public void SetTargetArea(Vector3 targetArea){
+        this.targetArea = targetArea;
+    }
+
+    public void StartFalling ()
     {
-        this.direction = targetPosition - this.transform.position;
+        this.direction = targetArea - this.transform.position;
         this.direction.Normalize ();
         gameObject.GetComponent<Rigidbody> ().velocity = this.direction * 25f;
     }

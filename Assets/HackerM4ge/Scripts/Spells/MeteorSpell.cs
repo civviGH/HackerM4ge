@@ -13,6 +13,19 @@ public class MeteorSpell : Spell
     private GameObject meteorPrefab;
     private LayerMask raycastLayerMask;
 
+    private SpellSelectState spellSelectState = SpellSelectState.Aiming;
+
+    private float draggingStartPosition;
+
+    private GameObject meteorToDrag;
+
+    private enum SpellSelectState
+    {
+        Aiming = 0,
+        MeteorSpawned = 1,
+        Dragging = 2,
+    };
+
     public MeteorSpell ()
     {
         this.Thumbnail = Resources.Load ("MeteorThumbnailMaterial") as Material;
@@ -24,22 +37,45 @@ public class MeteorSpell : Spell
     TWandAction[] Spell.UpdateSpell (TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        if (rightTriggerState.press) {
-            RightTriggerPress (rightControllerPosition, rightControllerDirection);
-        }
-        if (rightTriggerState.up) {
-            RightTriggerUp ();
+        UpdateSpellSelectState (rightTriggerState, leftTriggerState);
+
+        switch (spellSelectState)
+        {
+        case SpellSelectState.Aiming:
+            if (rightTriggerState.press) {
+                UpdateAiming (rightControllerPosition, rightControllerDirection);
+            }            
+            if (this.previewSphere && rightTriggerState.up) {
+                spellSelectState = SpellSelectState.MeteorSpawned;
+                meteorToDrag = SpawnMeteorToPosition (previewSphere.transform.position);
+            }
+            break;
+
+        case SpellSelectState.MeteorSpawned:
+            if (rightTriggerState.press && leftTriggerState.press) {
+                spellSelectState = SpellSelectState.Dragging;
+                meteorToDrag.GetComponent<MeteorController> ().SetTargetArea (previewSphere.transform.position);
+                UnityEngine.Object.Destroy (this.previewSphere);
+                //TODO check ob linker controller ueberhaupt da ist
+                draggingStartPosition = (rightControllerPosition.y + leftControllerPosition.Value.y) / 2f;
+            }
+            break;
+
+        case SpellSelectState.Dragging:
+            if (!rightTriggerState.press && !leftTriggerState.press) {
+                float draggingEndPosition = (rightControllerPosition.y + leftControllerPosition.Value.y) / 2f;
+                float dragLength = draggingStartPosition - draggingEndPosition;
+                spellSelectState = SpellSelectState.Aiming;
+                meteorToDrag.GetComponent<MeteorController> ().StartFalling ();
+            }
+            break;
         }
 
         TWandAction[] actions = { };
         return actions;
     }
 
-    private void RightTriggerDown ()
-    {
-    }
-
-    private void RightTriggerPress (Vector3 wandPosition, Vector3 wandDirection)
+    private void UpdateAiming (Vector3 wandPosition, Vector3 wandDirection)
     {
         RaycastHit hitObject;
         Ray ray = new Ray (wandPosition, wandDirection);
@@ -55,15 +91,7 @@ public class MeteorSpell : Spell
         }
     }
 
-    private void RightTriggerUp ()
-    {
-        if (this.previewSphere) {
-            SpawnMeteorToPosition (previewSphere.transform.position);	
-            UnityEngine.Object.Destroy (this.previewSphere);
-        }
-    }
-
-    private void SpawnMeteorToPosition (Vector3 targetArea)
+    private GameObject SpawnMeteorToPosition (Vector3 targetArea)
     {
         // instantiate meteor
         GameObject actualMeteor = GameObject.Instantiate (
@@ -72,7 +100,7 @@ public class MeteorSpell : Spell
                                   20,
                                   UnityEngine.Random.Range (-15f, 15f)),
                                   new Quaternion ());
-        actualMeteor.GetComponent<MeteorController> ().StartFalling (targetArea);
+        return actualMeteor;
     }
 
     Material Spell.GetThumbnail ()
@@ -97,5 +125,18 @@ public class MeteorSpell : Spell
     {
         TWandAction[] actions = { };
         return actions;
+    }
+
+    private void UpdateSpellSelectState(TriggerState rightTriggerState, TriggerState leftTriggerState){
+        switch (spellSelectState) {
+        case SpellSelectState.Aiming:
+
+            break;
+        case SpellSelectState.MeteorSpawned:
+ 
+            break;
+        case SpellSelectState.Dragging:
+            break;
+        }
     }
 }
