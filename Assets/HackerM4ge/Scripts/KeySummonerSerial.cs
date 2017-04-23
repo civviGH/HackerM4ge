@@ -26,19 +26,16 @@ public class KeySummonerSerial : MonoBehaviour {
         else
         {
             if (!showing) return;
-            StartCoroutine(animate(true));
+            StartCoroutine(animate(false));
         }
     }
 
     private IEnumerator animate(bool state)
     {
-        showing = true;
+        showing = state;
         for (int i = 0; i < children.Length; i++)
         {
             children[i].SetBool("Shown", state);
-            var anim = children[i].GetComponent<Animator>();
-            anim.speed = 0.01f;
-            anim.Update(0.01f);
             yield return new WaitForSeconds(delay);
         }
     }
