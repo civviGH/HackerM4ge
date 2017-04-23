@@ -11,6 +11,8 @@ class LasertrapSpell : MonoBehaviour, Spell
     private GameObject laserSourcePrefab;
     private Material laserBeamHazardMaterial;
     private LayerMask surfaceLayer;
+    private Material laserSourceBlueprintMaterial;
+    private Material laserSourceMaterial;
 
     private GameObject rightHandTrapSource;
     private GameObject leftHandTrapSource;
@@ -29,6 +31,8 @@ class LasertrapSpell : MonoBehaviour, Spell
     public LasertrapSpell()
     {
         laserSourcePrefab = Resources.Load<GameObject>("LaserTrapSpellPrefabs/LaserSource");
+        laserSourceMaterial = laserSourcePrefab.GetComponent<MeshRenderer>().materials[1];
+        laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/laserSourceBlueprintMaterial");
         laserBeamHazardMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/LaserBeamHazard");
         surfaceLayer = LayerMask.GetMask("Surfaces");
     }
@@ -37,15 +41,8 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         rightHandTrapSource = Instantiate(laserSourcePrefab);
         leftHandTrapSource = Instantiate(laserSourcePrefab);
-        Material material = rightHandTrapSource.GetComponent<MeshRenderer>().materials[1];
-        material.SetFloat("_Mode", 2);
-        material.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
-        material.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha);
-        material.SetInt("_ZWrite", 0);
-        material.DisableKeyword("_ALPHATEST_ON");
-        material.EnableKeyword("_ALPHABLEND_ON");
-        material.DisableKeyword("_ALPHAPREMULTIPLY_ON");
-        material.renderQueue = 3000;
+        rightHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
+        leftHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
     }
