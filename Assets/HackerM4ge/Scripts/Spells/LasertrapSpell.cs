@@ -30,6 +30,7 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     public LasertrapSpell()
     {
+        // TODO Ressourcen in der GUI setzen. Dafür müssen die Spells von vorne herein an irgendein GameObject...
         laserSourcePrefab = Resources.Load<GameObject>("LaserTrapSpellPrefabs/LaserSourcePrefab");
         laserSourceMaterial = laserSourcePrefab.GetComponent<MeshRenderer>().sharedMaterials[0];
         laserSourceBlueprintMaterial = Resources.Load<Material>("LaserTrapSpellPrefabs/Materials/laserSourceBlueprintMaterial");
@@ -42,8 +43,10 @@ class LasertrapSpell : MonoBehaviour, Spell
     {
         rightHandTrapSource = Instantiate(laserSourcePrefab);
         leftHandTrapSource = Instantiate(laserSourcePrefab);
-        rightHandTrapSource.GetComponent<MeshRenderer>().material = laserSourceBlueprintMaterial;
-        leftHandTrapSource.GetComponent<MeshRenderer>().material = laserSourceBlueprintMaterial;
+        rightHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceBlueprintMaterial;
+        leftHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceBlueprintMaterial;
+        rightHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
+        leftHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceBlueprintMaterial;
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
     }
@@ -85,6 +88,10 @@ class LasertrapSpell : MonoBehaviour, Spell
         if (rightHandTrapSourcePlaced && leftHandTrapSourcePlaced)
         {
             GameObject laser = CreateLaser(rightHandTrapSource.transform.position, leftHandTrapSource.transform.position);
+            rightHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceMaterial;
+            leftHandTrapSource.GetComponent<MeshRenderer>().materials[0] = laserSourceMaterial;
+            rightHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceMaterial;
+            leftHandTrapSource.GetComponent<MeshRenderer>().materials[1] = laserSourceMaterial;
             Destroy(rightHandTrapSource, lifetime);
             Destroy(leftHandTrapSource, lifetime);
             Destroy(laser, lifetime);
