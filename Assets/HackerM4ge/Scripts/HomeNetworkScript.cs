@@ -28,7 +28,6 @@ public class HomeNetworkScript : MonoBehaviour
     public void Damage(int damage)
     {
         this.health -= damage;
-        // Debug.Log ("Network health: " + this.health);
         if (this.health > 0) {
             PlayDamageSound ();
             this.healthManager.DamageFlash ();
