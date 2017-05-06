@@ -67,7 +67,12 @@ public class SpellSelectComponent : MonoBehaviour {
 
     void OnTriggerEnter(Collider collider)
     {
-        Debug.Log("SpellSelectComponent's controller collided with" + collider.gameObject.name);
+        GetComponent<WandController>().SelectSpell(
+            collider.gameObject.GetComponent<SpellThumbnailComponent>().spell
+        );
+        spellSelectState = SpellSelectState.Idle;
+
+        // TODO destroy all thumbnails
     }
 
     private void UpdateVisualization()
@@ -180,6 +185,8 @@ public class SpellSelectComponent : MonoBehaviour {
             Vector3 spellEuler = spellSelect.transform.rotation.eulerAngles;
             spellEuler.x = 90f;
             spellSelect.transform.rotation = Quaternion.Euler(spellEuler);
+
+            spellSelect.GetComponent<SpellThumbnailComponent>().spell = listOfSpells[i];
         }
     }
 

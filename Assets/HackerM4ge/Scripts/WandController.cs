@@ -106,6 +106,21 @@ public class WandController : MonoBehaviour
         currentSpellIndex = newSpellIndex;
     }
 
+    public void SelectSpell(Spell spell)
+    {
+        int newSpellIndex = listOfSpells.FindIndex(
+            spell_ => spell_.GetType() == spell.GetType()
+        );
+
+        if(newSpellIndex < 0)
+        {
+            Debug.LogError("Couldn't find spell " + spell.GetType());
+            return;
+        }
+
+        currentSpellIndex = newSpellIndex;
+    }
+
     private int GetSpellIndexPlus(int delta)
     {
         return ((currentSpellIndex + delta) % listOfSpells.Count + listOfSpells.Count) % listOfSpells.Count;
