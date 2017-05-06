@@ -35,7 +35,7 @@ public class SpellSelectComponent : MonoBehaviour {
 
     private GameObject castingRing;
 
-    List<GameObject> activeSpellThumbnails = new List<GameObject>;
+    List<GameObject> activeSpellThumbnails = new List<GameObject>();
 
     List<Spell> listOfSpells = new List<Spell>();
 
