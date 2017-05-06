@@ -84,6 +84,9 @@ public class TeleportController : MonoBehaviour
                     transform.parent.gameObject.transform.position += nextPlatform.transform.position - cameraComponent.currentPlatformTransform.position;
                     cameraComponent.currentPlatformTransform = nextPlatform.transform;
                     teleportSound.Play();
+
+                    // TODO Vielleicht wäre ein generischerer Mechanismus sinnvoll, über Event Hooks oder den WandController.
+                    GetComponent<SpellSelectComponent>().Reset();
                 }
             }
             unhighlightPlatform();

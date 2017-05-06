@@ -35,6 +35,8 @@ public class SpellSelectComponent : MonoBehaviour {
 
     private GameObject castingRing;
 
+    List<GameObject> activeSpellThumbnails = new List<GameObject>;
+
     List<Spell> listOfSpells = new List<Spell>();
 
     private enum SpellSelectState
@@ -67,12 +69,30 @@ public class SpellSelectComponent : MonoBehaviour {
 
     void OnTriggerEnter(Collider collider)
     {
-        GetComponent<WandController>().SelectSpell(
-            collider.gameObject.GetComponent<SpellThumbnailComponent>().spell
-        );
+        SpellThumbnailComponent spellThumbnailComponent = collider.gameObject.GetComponent<SpellThumbnailComponent>();
+        if(spellThumbnailComponent == null) {
+            return;
+        }
+
+        SelectSpell(spellThumbnailComponent.spell);
+    }
+
+    public void Reset()
+    {
         spellSelectState = SpellSelectState.Idle;
 
-        // TODO destroy all thumbnails
+        activeSpellThumbnails.ForEach(
+            spellThumbnail => Destroy(spellThumbnail)
+        );
+        activeSpellThumbnails.Clear();
+
+        Destroy(castingRing);
+    }
+
+    private void SelectSpell(Spell spell)
+    {
+        GetComponent<WandController>().SelectSpell(spell);
+        Reset();
     }
 
     private void UpdateVisualization()
@@ -133,6 +153,7 @@ public class SpellSelectComponent : MonoBehaviour {
         switch (spellSelectState)
         {
             case SpellSelectState.Idle:
+            case SpellSelectState.Selecting:
                 if (
                     SelectButtonPressed(ThisController())
                     && SelectButtonPressed(OtherController())
@@ -163,10 +184,6 @@ public class SpellSelectComponent : MonoBehaviour {
                     }
                 }
                 break;
-
-            case SpellSelectState.Selecting:
-                break;
-
         }
     }
 
@@ -187,6 +204,7 @@ public class SpellSelectComponent : MonoBehaviour {
             spellSelect.transform.rotation = Quaternion.Euler(spellEuler);
 
             spellSelect.GetComponent<SpellThumbnailComponent>().spell = listOfSpells[i];
+            activeSpellThumbnails.Add(spellSelect);
         }
     }
 
