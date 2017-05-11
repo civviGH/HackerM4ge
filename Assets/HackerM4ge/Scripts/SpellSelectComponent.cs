@@ -243,6 +243,10 @@ public class SpellSelectComponent : MonoBehaviour {
 
         while (timePassed < castingRingFadeOutSeconds)
         {
+            if(castingRing == null)
+            {
+                yield break;
+            }
             var color = castingRing.GetComponent<Renderer>().material.GetColor(colorId);
             color.a = initialAlpha * (castingRingFadeOutSeconds - timePassed) / castingRingFadeOutSeconds;
             castingRing.GetComponent<Renderer>().material.SetColor(colorId, color);

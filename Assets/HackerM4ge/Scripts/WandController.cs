@@ -103,7 +103,17 @@ public class WandController : MonoBehaviour
 
     private void SelectSpellByIndex(int newSpellIndex)
     {
+        if(newSpellIndex == currentSpellIndex)
+        {
+            return;
+        }
+        TWandAction[] wandActions;
+        wandActions = SelectedSpell().Deselect();
+        ExecuteWandActions(wandActions);
         currentSpellIndex = newSpellIndex;
+        wandActions = SelectedSpell().Select();
+        ExecuteWandActions(wandActions);
+        UpdateThumbnail();
     }
 
     public void SelectSpell(Spell spell)
@@ -118,7 +128,7 @@ public class WandController : MonoBehaviour
             return;
         }
 
-        currentSpellIndex = newSpellIndex;
+        SelectSpellByIndex(newSpellIndex);
     }
 
     private int GetSpellIndexPlus(int delta)
@@ -137,16 +147,7 @@ public class WandController : MonoBehaviour
         {
             newSpellIndex = GetSpellIndexPlus(1);
         }
-        if (newSpellIndex != currentSpellIndex)
-        {
-            TWandAction[] wandActions;
-            wandActions = SelectedSpell().Deselect();
-            ExecuteWandActions(wandActions);
-            SelectSpellByIndex(newSpellIndex);
-            wandActions = SelectedSpell().Select();
-            ExecuteWandActions(wandActions);
-            UpdateThumbnail();
-        }
+        SelectSpellByIndex(newSpellIndex);
     }
 
     void UpdateThumbnail()
