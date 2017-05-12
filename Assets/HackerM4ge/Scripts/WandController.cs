@@ -88,8 +88,6 @@ public class WandController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        SpellSelect();
-
         TWandAction[] wandActions = GetWandActions();
         ExecuteWandActions(wandActions);
 
@@ -131,56 +129,9 @@ public class WandController : MonoBehaviour
         SelectSpellByIndex(newSpellIndex);
     }
 
-    private int GetSpellIndexPlus(int delta)
-    {
-        return ((currentSpellIndex + delta) % listOfSpells.Count + listOfSpells.Count) % listOfSpells.Count;
-    }
-
-    void SpellSelect()
-    {
-        int newSpellIndex = currentSpellIndex;
-        if (SpellSelectPreviousDown())
-        {
-            newSpellIndex = GetSpellIndexPlus(-1);
-        }
-        if (SpellSelectNextDown())
-        {
-            newSpellIndex = GetSpellIndexPlus(1);
-        }
-        SelectSpellByIndex(newSpellIndex);
-    }
-
     void UpdateThumbnail()
     {
         thumbnailPanel.GetComponent<Renderer>().material = SelectedSpell().GetThumbnail();
-    }
-
-    private bool SpellSelectNextDown()
-    {
-        Direction direction = Helper.GetDirectionOfTouchpad(rightController);
-        switch (controllerType)
-        {
-            case ControllerType.Oculus:
-                return lastFrameTouchpadDirection != direction && direction == Direction.right;
-            case ControllerType.Vive:
-                return rightController.GetPressDown(touchpad) && direction == Direction.right;
-            default:
-                throw new NotImplementedException();
-        }
-    }
-
-    private bool SpellSelectPreviousDown()
-    {
-        Direction direction = Helper.GetDirectionOfTouchpad(rightController);
-        switch (controllerType)
-        {
-            case ControllerType.Oculus:
-                return lastFrameTouchpadDirection != direction && direction == Direction.left;
-            case ControllerType.Vive:
-                return rightController.GetPressDown(touchpad) && direction == Direction.left;
-            default:
-                throw new NotImplementedException();
-        }
     }
 
     private TWandAction[] GetWandActions(){
