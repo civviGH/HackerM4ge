@@ -37,31 +37,16 @@ public class WandController : MonoBehaviour
         }
     }
 
-
     private ControllerType controllerType;
 
     private SteamVR_TrackedObject trackedObj;
 
-    // List of spells
-    List<Spell> listOfSpells = new List<Spell>();
-    private int currentSpellIndex = 0;
+    private Spell selectedSpell;
 
     // Use this for initialization
     void Start()
     {
         trackedObj = GetComponent<SteamVR_TrackedObject>();
-
-        // Add spells to spellList
-        listOfSpells.Add(new MeteorSpell());
-        listOfSpells.Add(new LasertrapSpell());
-        listOfSpells.Add(new ChaosSpell());
-
-        TWandAction[] wandActions = SelectedSpell().Select();
-
-        ExecuteWandActions(wandActions);
-
-        // Put material of spell on thumbnailpanel
-        UpdateThumbnail();
 
         controllerType = Helper.GetControllerType(rightController);
         //Debug.Log(string.Format("{0} Controller detected", Enum.GetName(typeof(ControllerType), controllerType)));
@@ -96,37 +81,29 @@ public class WandController : MonoBehaviour
         
     private Spell SelectedSpell()
     {
-        return listOfSpells[currentSpellIndex];
-    }
-
-    private void SelectSpellByIndex(int newSpellIndex)
-    {
-        if(newSpellIndex == currentSpellIndex)
-        {
-            return;
-        }
-        TWandAction[] wandActions;
-        wandActions = SelectedSpell().Deselect();
-        ExecuteWandActions(wandActions);
-        currentSpellIndex = newSpellIndex;
-        wandActions = SelectedSpell().Select();
-        ExecuteWandActions(wandActions);
-        UpdateThumbnail();
+        return selectedSpell;
     }
 
     public void SelectSpell(Spell spell)
     {
-        int newSpellIndex = listOfSpells.FindIndex(
-            spell_ => spell_.GetType() == spell.GetType()
-        );
+        TWandAction[] wandActions;
 
-        if(newSpellIndex < 0)
+        if (SelectedSpell() != null)
         {
-            Debug.LogError("Couldn't find spell " + spell.GetType());
-            return;
+            if (SelectedSpell().GetType() == spell.GetType())
+            {
+                return;
+            }
+
+            wandActions = SelectedSpell().Deselect();
+            ExecuteWandActions(wandActions);
         }
 
-        SelectSpellByIndex(newSpellIndex);
+        selectedSpell = spell;
+
+        wandActions = SelectedSpell().Select();
+        ExecuteWandActions(wandActions);
+        UpdateThumbnail();
     }
 
     void UpdateThumbnail()
@@ -134,52 +111,47 @@ public class WandController : MonoBehaviour
         thumbnailPanel.GetComponent<Renderer>().material = SelectedSpell().GetThumbnail();
     }
 
-    private TWandAction[] GetWandActions(){
-
+    private TWandAction[] GetWandActions() {
+        if (SelectedSpell() == null)
+        {
+            return new TWandAction[0];
+        }
         Vector3 normalizedDirection = Helper.WandDirection(transform, controllerType);
         normalizedDirection.Normalize();
 
-        if (leftController == null) {
-            return SelectedSpell().UpdateSpell(
-                new TriggerState(
-                    rightController.GetPressUp(triggerButton),
-                    rightController.GetPressDown(triggerButton),
-                    rightController.GetPress(triggerButton)
-                ),
-                rightController.GetAxis(),
-                transform.position,
-                normalizedDirection,
-                new TriggerState(
-                    false,
-                    false,
-                    false
-                ),
-                Vector2.zero,
-                null,
-                null
-            );
+        Vector2 leftControllerAxis = Vector2.zero;
+        Vector3? leftControllerPosition = null;
+        Vector3? leftControllerDirection = null;
 
-        } else {
-            return SelectedSpell().UpdateSpell(
-                new TriggerState(
-                    rightController.GetPressUp(triggerButton),
-                    rightController.GetPressDown(triggerButton),
-                    rightController.GetPress(triggerButton)
-                ),
-                rightController.GetAxis(),
-                transform.position,
-                normalizedDirection,
-                new TriggerState(
-                    leftController.GetPressUp(triggerButton),
-                    leftController.GetPressDown(triggerButton),
-                    leftController.GetPress(triggerButton)
-                ),
-                leftController.GetAxis(),
-                leftControllerObject.transform.position,
-                Helper.WandDirection(leftControllerObject.transform, controllerType).normalized
-            );
+        if (leftController != null) {
+            leftControllerAxis = leftController.GetAxis();
+            leftControllerPosition = leftControllerObject.transform.position;
+            leftControllerDirection = Helper.WandDirection(leftControllerObject.transform, controllerType).normalized;
         }
 
+        return SelectedSpell().UpdateSpell(
+            GetTriggerState(rightController),
+            rightController.GetAxis(),
+            transform.position,
+            normalizedDirection,
+            GetTriggerState(leftController),
+            leftControllerAxis,
+            leftControllerPosition,
+            leftControllerDirection
+        );
     }
 
+    private static TriggerState GetTriggerState(SteamVR_Controller.Device controller)
+    {
+        if(controller == null)
+        {
+            return new TriggerState(false, false, false);
+        }
+
+        return new TriggerState(
+            controller.GetPressUp(triggerButton),
+            controller.GetPressDown(triggerButton),
+            controller.GetPress(triggerButton)
+        );
+    }
 }

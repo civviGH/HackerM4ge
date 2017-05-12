@@ -27,6 +27,11 @@ class LasertrapSpell : MonoBehaviour, Spell
      * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
      */
 
+    /*
+     * TODO:
+     * MonoBehaviour entfernen. Dafür muss auf Instantiate() Aufrufe verzichtet werden.
+     */
+
     public LasertrapSpell()
     {
         // TODO Ressourcen in der GUI setzen. Dafür müssen die Spells von vorne herein an irgendein GameObject...
