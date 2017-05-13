@@ -2,7 +2,7 @@ using UnityEngine;
 
 using TWandAction = Union2<WandAction.Drain, WandAction.Vibrate>;
 
-class LasertrapSpell : MonoBehaviour, Spell
+class LasertrapSpell : Spell
 {
     const float minimalDistance = 0.2f;
     const float maxSpeed = 15f;
@@ -45,8 +45,8 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     private void Init()
     {
-        rightHandTrapSource = Instantiate(laserSourcePrefab);
-        leftHandTrapSource = Instantiate(laserSourcePrefab);
+        rightHandTrapSource = Object.Instantiate(laserSourcePrefab);
+        leftHandTrapSource = Object.Instantiate(laserSourcePrefab);
         Material[] materials = { laserSourceBlueprintMaterial, laserSourceBlueprintMaterial };
         rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
         leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
@@ -94,9 +94,9 @@ class LasertrapSpell : MonoBehaviour, Spell
             Material[] materials = { laserSourceMaterial, laserSourceMaterial };
             rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
             leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
-            Destroy(rightHandTrapSource, lifetime);
-            Destroy(leftHandTrapSource, lifetime);
-            Destroy(laser, lifetime);
+            Object.Destroy(rightHandTrapSource, lifetime);
+            Object.Destroy(leftHandTrapSource, lifetime);
+            Object.Destroy(laser, lifetime);
 
             Init();
         }
@@ -167,8 +167,8 @@ class LasertrapSpell : MonoBehaviour, Spell
 
     TWandAction[] Spell.Deselect()
     {
-        Destroy(rightHandTrapSource);
-        Destroy(leftHandTrapSource);
+        Object.Destroy(rightHandTrapSource);
+        Object.Destroy(leftHandTrapSource);
         rightHandTrapSource = null;
         leftHandTrapSource = null;
 
