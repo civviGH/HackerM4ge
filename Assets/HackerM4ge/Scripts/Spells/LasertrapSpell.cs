@@ -17,6 +17,8 @@ class LasertrapSpell : Spell
     private GameObject rightHandTrapSource;
     private GameObject leftHandTrapSource;
 
+    private bool rightHandTrapSourcePlacing;
+    private bool leftHandTrapSourcePlacing;
     private bool rightHandTrapSourcePlaced;
     private bool leftHandTrapSourcePlaced;
     private bool rightHandTrapSourceThrowing;
@@ -29,6 +31,7 @@ class LasertrapSpell : Spell
      * - Nach dem Setzen nicht direkt den Laser einschalten, sondern Traps erst noch "werfen"
      * - Trap-Positionen beim Setzen besser sichtbar machen: Strahl in den Himmel z.B.?
      * - Schadenssschema ändern: Gesamtschaden statt Lebensdauer beschränken, dafür mehr DPS machen (evtl. einfach unbegrenzt, zumindest aber genug um normale Gegner zu töten bevor sie durchlaufen können)
+     * - Traps erst ab "Placing" sichtbar machen, oder vielleicht erst nur an der Hand sichtbar machen und ab Placing in der Ferne
      */
 
     /*
@@ -54,6 +57,8 @@ class LasertrapSpell : Spell
         Material[] materials = { laserSourceBlueprintMaterial, laserSourceBlueprintMaterial };
         rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
         leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
+        rightHandTrapSourcePlacing = false;
+        leftHandTrapSourcePlacing = false;
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
         rightHandTrapSourceThrowing = false;
@@ -75,23 +80,62 @@ class LasertrapSpell : Spell
     TWandAction[] Spell.UpdateSpell(TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
-        // right controller
         if (!rightHandTrapSourcePlaced)
         {
             UpdateTrapSource(ref rightHandTrapSource, rightTouchpadAxis, rightControllerPosition, rightControllerDirection);
-            if (rightTriggerState.down && !rightHandTrapSourcePlaced && NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
+        }
+        if (!leftHandTrapSourcePlaced && leftControllerPosition != null && leftControllerDirection != null)
+        {
+            UpdateTrapSource(ref leftHandTrapSource, leftTouchpadAxis, leftControllerPosition.Value, leftControllerDirection.Value);
+        }
+
+        // right controller
+        if (!rightHandTrapSourcePlacing)
+        {
+            if (rightTriggerState.down && !rightHandTrapSourcePlaced)
             {
-                rightHandTrapSourcePlaced = true;
+                rightHandTrapSourcePlacing = true;
             }
         }
 
         // left controller
-        if (!leftHandTrapSourcePlaced && leftControllerPosition != null && leftControllerDirection != null)
+        if (!leftHandTrapSourcePlacing && leftControllerPosition != null && leftControllerDirection != null)
         {
-            UpdateTrapSource(ref leftHandTrapSource, leftTouchpadAxis, leftControllerPosition.Value, leftControllerDirection.Value);
-            if (leftTriggerState.down && !leftHandTrapSourcePlaced && NextSurfacePosition(leftControllerPosition.Value, leftControllerDirection.Value) != null)
+            if (leftTriggerState.down && !leftHandTrapSourcePlaced)
             {
-                leftHandTrapSourcePlaced = true;
+                leftHandTrapSourcePlacing = true;
+            }
+        }
+
+        // right controller
+        if (rightHandTrapSourcePlacing && !rightHandTrapSourcePlaced)
+        {
+            if (rightTriggerState.up)
+            {
+                if (NextSurfacePosition(rightControllerPosition, rightControllerDirection) != null)
+                {
+                    rightHandTrapSourcePlaced = true;
+                }
+                else
+                {
+                    rightHandTrapSourcePlacing = false;
+                }
+            }
+        }
+
+        // left controller
+        if (leftHandTrapSourcePlacing && !leftHandTrapSourcePlaced && leftControllerPosition != null && leftControllerDirection != null)
+        {
+            if (leftTriggerState.up)
+            {
+                if (NextSurfacePosition(leftControllerPosition.Value, leftControllerDirection.Value) != null)
+                {
+                    leftHandTrapSourcePlaced = true;
+                }
+                else
+                {
+                    leftHandTrapSourcePlacing = false;
+                }
             }
         }
 
