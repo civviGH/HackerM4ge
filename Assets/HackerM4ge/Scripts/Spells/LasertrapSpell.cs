@@ -99,7 +99,7 @@ class LasertrapSpell : Spell
         }
 
         // left controller
-        if (!leftHandTrapSourcePlacing && leftControllerPosition != null && leftControllerDirection != null)
+        if (!leftHandTrapSourcePlacing)
         {
             if (leftTriggerState.down && !leftHandTrapSourcePlaced)
             {
@@ -146,7 +146,7 @@ class LasertrapSpell : Spell
                 rightHandTrapSourceThrowing = true;
             }
         }
-        if (leftHandTrapSourcePlaced && ! leftHandTrapSourceThrowing && leftControllerPosition != null && leftControllerDirection != null)
+        if (leftHandTrapSourcePlaced && ! leftHandTrapSourceThrowing)
         {
             if (leftTriggerState.down)
             {
@@ -166,7 +166,7 @@ class LasertrapSpell : Spell
         }
         if (leftHandTrapSourceThrowing && !leftHandTrapSourceThrown && leftControllerPosition != null && leftControllerDirection != null)
         {
-            if (leftTriggerState.down)
+            if (leftTriggerState.up)
             {
                 leftHandTrapSourceThrown = true;
                 Material[] materials = { laserSourceMaterial, laserSourceMaterial };
