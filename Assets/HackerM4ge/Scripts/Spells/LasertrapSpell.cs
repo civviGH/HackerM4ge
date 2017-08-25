@@ -19,6 +19,10 @@ class LasertrapSpell : Spell
 
     private bool rightHandTrapSourcePlaced;
     private bool leftHandTrapSourcePlaced;
+    private bool rightHandTrapSourceThrowing;
+    private bool leftHandTrapSourceThrowing;
+    private bool rightHandTrapSourceThrown;
+    private bool leftHandTrapSourceThrown;
 
     /*
      * TODO:
@@ -52,6 +56,10 @@ class LasertrapSpell : Spell
         leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
         rightHandTrapSourcePlaced = false;
         leftHandTrapSourcePlaced = false;
+        rightHandTrapSourceThrowing = false;
+        leftHandTrapSourceThrowing = false;
+        rightHandTrapSourceThrown = false;
+        leftHandTrapSourceThrown = false;
     }
 
     string Spell.GetName()
@@ -87,13 +95,45 @@ class LasertrapSpell : Spell
             }
         }
 
+        if (rightHandTrapSourcePlaced && ! rightHandTrapSourceThrowing)
+        {
+            if(rightTriggerState.down)
+            {
+                rightHandTrapSourceThrowing = true;
+            }
+        }
+        if (leftHandTrapSourcePlaced && ! leftHandTrapSourceThrowing && leftControllerPosition != null && leftControllerDirection != null)
+        {
+            if (leftTriggerState.down)
+            {
+                leftHandTrapSourceThrowing = true;
+            }
+        }
+
+
+        if (rightHandTrapSourceThrowing && !rightHandTrapSourceThrown)
+        {
+            if (rightTriggerState.up)
+            {
+                rightHandTrapSourceThrown = true;
+                Material[] materials = { laserSourceMaterial, laserSourceMaterial };
+                rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
+            }
+        }
+        if (leftHandTrapSourceThrowing && !leftHandTrapSourceThrown && leftControllerPosition != null && leftControllerDirection != null)
+        {
+            if (leftTriggerState.down)
+            {
+                leftHandTrapSourceThrown = true;
+                Material[] materials = { laserSourceMaterial, laserSourceMaterial };
+                leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
+            }
+        }
+
         // when both are placed, finish and reset
-        if (rightHandTrapSourcePlaced && leftHandTrapSourcePlaced)
+        if (rightHandTrapSourceThrown && leftHandTrapSourceThrown)
         {
             GameObject laser = CreateLaser(rightHandTrapSource.transform.position, leftHandTrapSource.transform.position);
-            Material[] materials = { laserSourceMaterial, laserSourceMaterial };
-            rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
-            leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
             Object.Destroy(rightHandTrapSource, lifetime);
             Object.Destroy(leftHandTrapSource, lifetime);
             Object.Destroy(laser, lifetime);
