@@ -21,21 +21,31 @@ public class KeySummonerSerial : MonoBehaviour {
         if (delta.magnitude < minDistance)
         {
             if (showing) return;
-            StartCoroutine(animate(true));
+            StartCoroutine("animateIn");
         }
         else
         {
             if (!showing) return;
-            StartCoroutine(animate(false));
+            StartCoroutine("animateOut");
         }
     }
 
-    private IEnumerator animate(bool state)
+    private IEnumerator animateIn()
     {
-        showing = state;
+        showing = true;
         for (int i = 0; i < children.Length; i++)
         {
-            children[i].SetBool("Shown", state);
+            children[i].SetBool("Shown", true);
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
+    private IEnumerator animateOut()
+    {
+        showing = false;
+        for (int i = 0; i < children.Length; i++)
+        {
+            children[i].SetBool("Shown", false);
             yield return new WaitForSeconds(delay);
         }
     }
