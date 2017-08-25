@@ -15,37 +15,28 @@ public class KeySummonerSerial : MonoBehaviour {
 
     // Update is called once per frame
     void Update() {
-        //Debug.Log ("showing: " + showing);
+        Debug.Log ("showing: " + showing);
         Vector3 delta = Camera.main.transform.position - transform.position;
-        //Debug.Log ("Delta.m: " + delta.magnitude);
+        Debug.Log("Delta.m: " + delta.magnitude);
+        Debug.Log("minDistance: " + minDistance);
         if (delta.magnitude < minDistance)
         {
             if (showing) return;
-            StartCoroutine("animateIn");
+            StartCoroutine("animate", true);
         }
         else
         {
             if (!showing) return;
-            StartCoroutine("animateOut");
+            StartCoroutine("animate", false);
         }
     }
 
-    private IEnumerator animateIn()
+    private IEnumerator animate(bool to)
     {
-        showing = true;
+        showing = to;
         for (int i = 0; i < children.Length; i++)
         {
-            children[i].SetBool("Shown", true);
-            yield return new WaitForSeconds(delay);
-        }
-    }
-
-    private IEnumerator animateOut()
-    {
-        showing = false;
-        for (int i = 0; i < children.Length; i++)
-        {
-            children[i].SetBool("Shown", false);
+            children[i].SetBool("Shown", to);
             yield return new WaitForSeconds(delay);
         }
     }
