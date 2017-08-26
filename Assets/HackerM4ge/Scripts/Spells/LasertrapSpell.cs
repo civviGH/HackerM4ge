@@ -17,14 +17,17 @@ class LasertrapSpell : Spell
     private GameObject rightHandTrapSource;
     private GameObject leftHandTrapSource;
 
-    private bool rightHandTrapSourcePlacing;
-    private bool leftHandTrapSourcePlacing;
-    private bool rightHandTrapSourcePlaced;
-    private bool leftHandTrapSourcePlaced;
-    private bool rightHandTrapSourceThrowing;
-    private bool leftHandTrapSourceThrowing;
-    private bool rightHandTrapSourceThrown;
-    private bool leftHandTrapSourceThrown;
+    private enum ControllerAndTrapSourceState
+    {
+        Initial = 0,
+        Placing = 1,
+        Placed = 2,
+        Throwing = 3,
+        Thrown = 4
+    };
+
+    private ControllerAndTrapSourceState leftHandState = ControllerAndTrapSourceState.Initial;
+    private ControllerAndTrapSourceState rightHandState = ControllerAndTrapSourceState.Initial;
 
     /*
      * TODO:
@@ -57,14 +60,8 @@ class LasertrapSpell : Spell
         Material[] materials = { laserSourceBlueprintMaterial, laserSourceBlueprintMaterial };
         rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
         leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
-        rightHandTrapSourcePlacing = false;
-        leftHandTrapSourcePlacing = false;
-        rightHandTrapSourcePlaced = false;
-        leftHandTrapSourcePlaced = false;
-        rightHandTrapSourceThrowing = false;
-        leftHandTrapSourceThrowing = false;
-        rightHandTrapSourceThrown = false;
-        leftHandTrapSourceThrown = false;
+        leftHandState = ControllerAndTrapSourceState.Initial;
+        rightHandState = ControllerAndTrapSourceState.Initial;
     }
 
     string Spell.GetName()
@@ -81,13 +78,14 @@ class LasertrapSpell : Spell
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
         UpdateControllerStateAndTrap(rightTriggerState, rightTouchpadAxis, rightControllerPosition, rightControllerDirection,
-            ref rightHandTrapSourcePlacing, ref rightHandTrapSourcePlaced, ref rightHandTrapSourceThrowing, ref rightHandTrapSourceThrown, ref rightHandTrapSource);
+            ref rightHandTrapSource, ref rightHandState
+        );
         UpdateControllerStateAndTrap(leftTriggerState, leftTouchpadAxis, leftControllerPosition, leftControllerDirection,
-            ref leftHandTrapSourcePlacing, ref leftHandTrapSourcePlaced, ref leftHandTrapSourceThrowing, ref leftHandTrapSourceThrown, ref leftHandTrapSource
+            ref leftHandTrapSource, ref leftHandState
         );
 
         // when both are placed, finish and reset
-        if (rightHandTrapSourceThrown && leftHandTrapSourceThrown)
+        if (rightHandState == ControllerAndTrapSourceState.Thrown && leftHandState == ControllerAndTrapSourceState.Thrown)
         {
             GameObject laser = CreateLaser(rightHandTrapSource.transform.position, leftHandTrapSource.transform.position);
             Object.Destroy(rightHandTrapSource, lifetime);
@@ -102,59 +100,52 @@ class LasertrapSpell : Spell
     }
 
     private void UpdateControllerStateAndTrap(TriggerState triggerState, Vector2 touchpadAxis, Vector3? controllerPosition, Vector3? controllerDirection,
-        ref bool trapSourcePlacing, ref bool trapSourcePlaced, ref bool trapSourceThrowing, ref bool trapSourceThrown, ref GameObject trapSource
-        )
+        ref GameObject trapSource, ref ControllerAndTrapSourceState state)
     {
-        if(controllerPosition == null || controllerDirection == null)
+        if (controllerPosition == null || controllerDirection == null)
         {
             // Controller isn't active
             return;
         }
 
-        if (!trapSourcePlaced)
+        switch (state)
         {
-            UpdateTrapSource(ref trapSource, touchpadAxis, controllerPosition.Value, controllerDirection.Value);
-        }
-
-        if (!trapSourcePlacing)
-        {
-            if (triggerState.down && !trapSourcePlaced)
-            {
-                trapSourcePlacing = true;
-            }
-        }
-
-        if (trapSourcePlacing && !trapSourcePlaced)
-        {
-            if (triggerState.up)
-            {
-                if (NextSurfacePosition(controllerPosition.Value, controllerDirection.Value) != null)
+            case ControllerAndTrapSourceState.Initial:
+                if (triggerState.down)
                 {
-                    trapSourcePlaced = true;
+                    state = ControllerAndTrapSourceState.Placing;
                 }
-                else
+                break;
+            case ControllerAndTrapSourceState.Placing:
+                UpdateTrapSource(ref trapSource, touchpadAxis, controllerPosition.Value, controllerDirection.Value);
+                if (triggerState.up)
                 {
-                    trapSourcePlacing = false;
+                    if (NextSurfacePosition(controllerPosition.Value, controllerDirection.Value) != null)
+                    {
+                        state = ControllerAndTrapSourceState.Placed;
+                    }
+                    else
+                    {
+                        state = ControllerAndTrapSourceState.Initial;
+                    }
                 }
-            }
-        }
-
-        if (trapSourcePlaced && !trapSourceThrowing)
-        {
-            if (triggerState.down)
-            {
-                trapSourceThrowing = true;
-            }
-        }
-
-        if (trapSourceThrowing && !trapSourceThrown)
-        {
-            if (triggerState.up)
-            {
-                trapSourceThrown = true;
-                Material[] materials = { laserSourceMaterial, laserSourceMaterial };
-                trapSource.GetComponent<MeshRenderer>().materials = materials;
-            }
+                break;
+            case ControllerAndTrapSourceState.Placed:
+                if (triggerState.down)
+                {
+                    state = ControllerAndTrapSourceState.Throwing;
+                }
+                break;
+            case ControllerAndTrapSourceState.Throwing:
+                if (triggerState.up)
+                {
+                    state = ControllerAndTrapSourceState.Thrown;
+                    Material[] materials = { laserSourceMaterial, laserSourceMaterial };
+                    trapSource.GetComponent<MeshRenderer>().materials = materials;
+                }
+                break;
+            case ControllerAndTrapSourceState.Thrown:
+                break;
         }
     }
 
