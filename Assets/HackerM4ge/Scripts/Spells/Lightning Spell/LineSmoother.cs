@@ -4,7 +4,8 @@ using System.Collections.Generic;
 
 public class LineSmoother : MonoBehaviour 
 {
-    public static Vector3[] SmoothLine( Vector3[] inputPoints, float segmentSize )
+    static private float zitterStärke = 0.1f;
+    public static Vector3[] SmoothLine( Vector3[] inputPoints, float segmentSize, bool zittern)
     {
         //create curves
         AnimationCurve curveX = new AnimationCurve();
@@ -39,7 +40,7 @@ public class LineSmoother : MonoBehaviour
 
         //list to write smoothed values to
         List<Vector3> lineSegments = new List<Vector3>();
-
+        int durchläufe = 0;
         //find segments in each section
         for( int i = 0; i < inputPoints.Length; i++ )
         {
@@ -54,15 +55,21 @@ public class LineSmoother : MonoBehaviour
 
                 //number of segments
                 int segments = (int)(distanceToNext / segmentSize);
-
                 //add segments
                 for( int s = 1; s < segments; s++ )
                 {
+                    durchläufe++;
                     //interpolated time on curve
                     float time = ((float)s/(float)segments) + (float)i;
 
                     //sample curves to find smoothed position
-                    Vector3 newSegment = new Vector3( curveX.Evaluate(time), curveY.Evaluate(time), curveZ.Evaluate(time) );
+                    Vector3 newSegment;
+                    if (zittern) {
+                        float temp = Mathf.Min((durchläufe / 10f), 10f);
+                        newSegment = new Vector3 (curveX.Evaluate (time)+temp*Random.Range(-zitterStärke,zitterStärke), curveY.Evaluate (time)+temp*Random.Range(-zitterStärke,zitterStärke), curveZ.Evaluate (time)+temp*Random.Range(-zitterStärke,zitterStärke));
+                    } else {
+                        newSegment = new Vector3 (curveX.Evaluate (time), curveY.Evaluate (time), curveZ.Evaluate (time));
+                    }
 
                     //add to list
                     lineSegments.Add( newSegment );

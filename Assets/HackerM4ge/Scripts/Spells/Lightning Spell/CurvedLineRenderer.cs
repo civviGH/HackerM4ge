@@ -8,6 +8,7 @@ public class CurvedLineRenderer : MonoBehaviour
     //PUBLIC
     public float lineSegmentSize = 0.15f;
     public float lineWidth = 0.1f;
+    public bool zittern = true;
     [Header("Gizmos")]
     public bool showGizmos = true;
     public float gizmoSize = 0.1f;
@@ -62,7 +63,7 @@ public class CurvedLineRenderer : MonoBehaviour
             LineRenderer line = this.GetComponent<LineRenderer>();
 
             //get smoothed values
-            Vector3[] smoothedPoints = LineSmoother.SmoothLine( linePositions, lineSegmentSize );
+            Vector3[] smoothedPoints = LineSmoother.SmoothLine( linePositions, lineSegmentSize, zittern );
 
             //set line settings
             line.SetVertexCount( smoothedPoints.Length );

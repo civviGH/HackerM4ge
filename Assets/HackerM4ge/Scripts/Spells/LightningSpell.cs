@@ -44,7 +44,7 @@ public class LightningSpell : Spell
                 Vector3? target = FindTarget (rightControllerPosition, rightControllerDirection);
             
                 if (target != null) {
-                    this.lightningObject = GameObject.Instantiate (this.lightningPrefab, rightControllerPosition, new Quaternion ());
+                    this.lightningObject = GameObject.Instantiate (this.lightningPrefab, rightControllerPosition-new Vector3(-10,-10,-10), new Quaternion ());
                     Transform transformTemp = this.lightningObject.transform;
                     this.lightningStart = transformTemp.GetChild (0).transform;
                     this.lightningMitte = transformTemp.GetChild (1).transform;
@@ -72,7 +72,7 @@ public class LightningSpell : Spell
                 CancelSpell ();
             }
             if (leftTriggerState.down) {
-                this.bendingStartPosition = rightControllerPosition;
+                this.bendingStartPosition = (Vector3) leftControllerPosition;
                 this.middleBeforeBending = this.lightningMitte.position;
                 spellSelectState = SpellSelectState.Bending;
             }
@@ -82,10 +82,23 @@ public class LightningSpell : Spell
                 spellSelectState = SpellSelectState.Grabbing;
                 break;
             }
-            if (rightTriggerState.up) {
+            if (rightTriggerState.press) {
+                Vector3? target = FindTarget (rightControllerPosition, rightControllerDirection);
+                if (target != null) {
+                    this.lightningStart.position = rightControllerPosition;
+                    this.lightningTarget.position = (Vector3)target;
+                    this.lightningMitte.position = (this.lightningStart.position + this.lightningTarget.position) / 2;
+                    this.middleBeforeBending = this.lightningMitte.position;
+                } else {
+                    CancelSpell ();
+                }
+            } else {
                 CancelSpell ();
             }
-            Vector3 offset = this.bendingStartPosition - rightControllerPosition;
+            if (leftTriggerState.down) {
+                this.bendingStartPosition = (Vector3) leftControllerPosition;
+            }
+            Vector3 offset = (Vector3)(this.bendingStartPosition - leftControllerPosition) * 20;
             this.lightningMitte.position = this.middleBeforeBending + offset;
             break;
 

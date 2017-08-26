@@ -52,6 +52,7 @@ public class SpellSelectComponent : MonoBehaviour {
         listOfSpells.Add(new LasertrapSpell());
         listOfSpells.Add(new ChaosSpell());
         listOfSpells.Add (new LightningSpell ());
+        listOfSpells.Add (new NewLightningSpell ());
 
         thisControllerObject = GetComponent<SteamVR_TrackedObject>();
 
