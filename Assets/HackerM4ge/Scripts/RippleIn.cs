@@ -6,7 +6,7 @@ public class RippleIn : MonoBehaviour {
 
     public float minDistance = 2f;
     public bool showing = false;
-    public float delay = 1f;
+    public float delay = 0.1f;
     public int randomCount = 4;
 
     protected Animator[] children;
