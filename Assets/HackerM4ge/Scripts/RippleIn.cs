@@ -4,9 +4,9 @@ using UnityEngine;
 
 public class RippleIn : MonoBehaviour {
 
-    public float minDistance = 2;
-    public bool showing;
-    public float delay = 0.1f;
+    public float minDistance = 2f;
+    public bool showing = false;
+    public float delay = 1f;
 
     protected Animator[] children;
 
@@ -25,24 +25,26 @@ public class RippleIn : MonoBehaviour {
         if (delta.magnitude < minDistance)
         {
             if (showing) return;
+            showing = true;
             StartCoroutine("ActivateRipple", true);
         }
         else
         {
             if (!showing) return;
+            showing = false;
             StartCoroutine("ActivateRipple", false);
         }
     }
 
     public IEnumerator ActivateRipple(bool state)
     {
-        showing = state;
-        yield return new WaitForSecondsRealtime(delay);
+        yield return new WaitForSeconds(delay);
 
         for (int i = 0; i < children.Length; i++)
         {
+            Debug.Log(Time.time);
             children[i].SetBool("Shown", state);
-            yield return new WaitForSecondsRealtime(delay);
+            yield return new WaitForSeconds(delay);
         }
     }
 
