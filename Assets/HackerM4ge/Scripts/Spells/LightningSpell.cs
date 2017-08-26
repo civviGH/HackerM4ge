@@ -19,10 +19,14 @@ public class LightningSpell : Spell
     private Transform lightningMitte;
     private Transform lightningTarget;
 
+    private Vector3 bendingStartPosition;
+    private Vector3 middleBeforeBending;
+
     private enum SpellSelectState
     {
         Aiming = 0,
-        Bending = 1,
+        Grabbing = 1,
+        Bending = 2,
     };
 
     public LightningSpell () {
@@ -50,11 +54,12 @@ public class LightningSpell : Spell
                     this.lightningTarget.position = (Vector3)target;
                     this.lightningMitte.position = (this.lightningStart.position + this.lightningTarget.position) / 2;
 
-                    spellSelectState = SpellSelectState.Bending;
+                    spellSelectState = SpellSelectState.Grabbing;
                 }
             }
             break;
-        case SpellSelectState.Bending:
+        case SpellSelectState.Grabbing:
+            Debug.Log ("Grabbing");
             if (rightTriggerState.press) {
                 Vector3? target = FindTarget (rightControllerPosition, rightControllerDirection);
                 if (target != null) {
@@ -67,8 +72,25 @@ public class LightningSpell : Spell
             } else {
                 CancelSpell ();
             }
-
+            if (leftTriggerState.down) {
+                Debug.Log ("LeftTriggerDown while grabbing");
+                this.bendingStartPosition = rightControllerPosition;
+                this.middleBeforeBending = this.lightningMitte.position;
+                spellSelectState = SpellSelectState.Bending;
+            }
+        case SpellSelectState.Bending:
+            Debug.Log ("Bending");
+            if (leftTriggerState.up) {
+                spellSelectState = SpellSelectState.Grabbing;
+                break;
+            }
+            if (rightTriggerState.up) {
+                CancelSpell ();
+            }
+            Vector3 offset = this.bendingStartPosition - rightControllerPosition;
+            this.lightningMitte.position = this.middleBeforeBending + offset;
             break;
+
             // TODO spark effekt wenn man kein ziel getroffen hat
         }
         TWandAction[] actions = { };    
