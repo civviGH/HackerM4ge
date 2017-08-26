@@ -16,6 +16,15 @@ class LasertrapSpell : Spell
 
     private GameObject rightHandTrapSource;
     private GameObject leftHandTrapSource;
+    private GameObject rightHandPlacedTrapSource;
+    private GameObject leftHandPlacedTrapSource;
+
+    private Vector3 rightHandThrowingStartPosition;
+    private Vector3 leftHandThrowingStartPosition;
+    private float rightHandThrowingStartTime;
+    private float leftHandThrowingStartTime;
+
+
 
     private enum ControllerAndTrapSourceState
     {
@@ -37,11 +46,6 @@ class LasertrapSpell : Spell
      * - Traps erst ab "Placing" sichtbar machen, oder vielleicht erst nur an der Hand sichtbar machen und ab Placing in der Ferne
      */
 
-    /*
-     * TODO:
-     * MonoBehaviour entfernen. Dafür muss auf Instantiate() Aufrufe verzichtet werden.
-     */
-
     public LasertrapSpell()
     {
         // TODO Ressourcen in der GUI setzen. Dafür müssen die Spells von vorne herein an irgendein GameObject...
@@ -55,13 +59,19 @@ class LasertrapSpell : Spell
 
     private void Init()
     {
-        rightHandTrapSource = Object.Instantiate(laserSourcePrefab);
-        leftHandTrapSource = Object.Instantiate(laserSourcePrefab);
-        Material[] materials = { laserSourceBlueprintMaterial, laserSourceBlueprintMaterial };
-        rightHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
-        leftHandTrapSource.GetComponent<MeshRenderer>().materials = materials;
+        rightHandTrapSource = InstantiateTrapSource();
+        leftHandTrapSource = InstantiateTrapSource();
         leftHandState = ControllerAndTrapSourceState.Initial;
         rightHandState = ControllerAndTrapSourceState.Initial;
+    }
+
+    GameObject InstantiateTrapSource()
+    {
+        GameObject trapSource = Object.Instantiate(laserSourcePrefab);
+        Material[] materials = { laserSourceBlueprintMaterial, laserSourceBlueprintMaterial };
+        trapSource.GetComponent<MeshRenderer>().materials = materials;
+
+        return trapSource;
     }
 
     string Spell.GetName()
@@ -78,18 +88,22 @@ class LasertrapSpell : Spell
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
         UpdateControllerStateAndTrap(rightTriggerState, rightTouchpadAxis, rightControllerPosition, rightControllerDirection,
-            ref rightHandTrapSource, ref rightHandState
+            ref rightHandTrapSource, ref rightHandPlacedTrapSource, ref rightHandState, ref rightHandThrowingStartPosition, ref rightHandThrowingStartTime
         );
         UpdateControllerStateAndTrap(leftTriggerState, leftTouchpadAxis, leftControllerPosition, leftControllerDirection,
-            ref leftHandTrapSource, ref leftHandState
+            ref leftHandTrapSource, ref leftHandPlacedTrapSource, ref leftHandState, ref leftHandThrowingStartPosition, ref leftHandThrowingStartTime
         );
 
         // when both are placed, finish and reset
         if (rightHandState == ControllerAndTrapSourceState.Thrown && leftHandState == ControllerAndTrapSourceState.Thrown)
         {
-            GameObject laser = CreateLaser(rightHandTrapSource.transform.position, leftHandTrapSource.transform.position);
-            Object.Destroy(rightHandTrapSource, lifetime);
-            Object.Destroy(leftHandTrapSource, lifetime);
+            MakeTrapSolid(rightHandPlacedTrapSource);
+            MakeTrapSolid(leftHandPlacedTrapSource);
+            GameObject laser = CreateLaser(rightHandPlacedTrapSource.transform.position, leftHandPlacedTrapSource.transform.position);
+            Object.Destroy(rightHandTrapSource);
+            Object.Destroy(leftHandTrapSource);
+            Object.Destroy(rightHandPlacedTrapSource, lifetime);
+            Object.Destroy(leftHandPlacedTrapSource, lifetime);
             Object.Destroy(laser, lifetime);
 
             Init();
@@ -100,7 +114,7 @@ class LasertrapSpell : Spell
     }
 
     private void UpdateControllerStateAndTrap(TriggerState triggerState, Vector2 touchpadAxis, Vector3? controllerPosition, Vector3? controllerDirection,
-        ref GameObject trapSource, ref ControllerAndTrapSourceState state)
+        ref GameObject trapSource, ref GameObject placedTrapSource, ref ControllerAndTrapSourceState state, ref Vector3 throwingStartPosition, ref float throwingStartTime)
     {
         if (controllerPosition == null || controllerDirection == null)
         {
@@ -111,18 +125,21 @@ class LasertrapSpell : Spell
         switch (state)
         {
             case ControllerAndTrapSourceState.Initial:
+                UpdateTrapSourcePosition(ref trapSource, controllerPosition.Value, controllerDirection.Value, false);
                 if (triggerState.down)
                 {
                     state = ControllerAndTrapSourceState.Placing;
                 }
                 break;
             case ControllerAndTrapSourceState.Placing:
-                UpdateTrapSource(ref trapSource, touchpadAxis, controllerPosition.Value, controllerDirection.Value);
+                UpdateTrapSourcePosition(ref trapSource, controllerPosition.Value, controllerDirection.Value, true);
                 if (triggerState.up)
                 {
                     if (NextSurfacePosition(controllerPosition.Value, controllerDirection.Value) != null)
                     {
                         state = ControllerAndTrapSourceState.Placed;
+                        placedTrapSource = trapSource;
+                        trapSource = InstantiateTrapSource();
                     }
                     else
                     {
@@ -133,15 +150,20 @@ class LasertrapSpell : Spell
             case ControllerAndTrapSourceState.Placed:
                 if (triggerState.down)
                 {
+                    throwingStartPosition = controllerPosition.Value;
+                    throwingStartTime = Time.time;
                     state = ControllerAndTrapSourceState.Throwing;
                 }
                 break;
             case ControllerAndTrapSourceState.Throwing:
+                UpdateTrapSourcePosition(ref trapSource, controllerPosition.Value, controllerDirection.Value, false);
                 if (triggerState.up)
                 {
+                    Vector3 direction = controllerPosition.Value - throwingStartPosition;
+                    float speed = direction.magnitude / (throwingStartTime - Time.time);
+
                     state = ControllerAndTrapSourceState.Thrown;
-                    Material[] materials = { laserSourceMaterial, laserSourceMaterial };
-                    trapSource.GetComponent<MeshRenderer>().materials = materials;
+                    MakeTrapSolid(trapSource);
                 }
                 break;
             case ControllerAndTrapSourceState.Thrown:
@@ -149,15 +171,16 @@ class LasertrapSpell : Spell
         }
     }
 
-    private void UpdateTrapSource(ref GameObject trapSource, Vector2 touchpadAxis, Vector3 wandPosition, Vector3 wandDirection)
+    private void MakeTrapSolid(GameObject trapSource)
     {
-        UpdateTrapSourcePosition(ref trapSource, wandPosition, wandDirection);
+        Material[] materials = { laserSourceMaterial, laserSourceMaterial };
+        trapSource.GetComponent<MeshRenderer>().materials = materials;
     }
 
-    private void UpdateTrapSourcePosition(ref GameObject trapSource, Vector3 wandPosition, Vector3 wandDirection)
+    private void UpdateTrapSourcePosition(ref GameObject trapSource, Vector3 wandPosition, Vector3 wandDirection, bool placeOnSurface)
     {
         Vector3? surfacePosition = NextSurfacePosition(wandPosition, wandDirection);
-        if (surfacePosition != null)
+        if (placeOnSurface && surfacePosition != null)
         {
             trapSource.transform.position = surfacePosition.Value + Vector3.up * 0.3f;
         }
