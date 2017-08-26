@@ -6,6 +6,7 @@ public class RippleIn : MonoBehaviour {
 
     public float minDistance = 2;
     public bool showing;
+    public float delay = 0.1;
 
     protected Animator[] children;
 
@@ -24,20 +25,25 @@ public class RippleIn : MonoBehaviour {
         if (delta.magnitude < minDistance)
         {
             if (showing) return;
-            showing = true;
-            for(int i = 0; i < children.Length; i++)
-            {
-                children[i].SetBool("Shown", true);
-            }
+            StartCoroutine("ActivateRipple", true);
         }
         else
         {
             if (!showing) return;
-            showing = false;
-            for (int i = 0; i < children.Length; i++)
-            {
-                children[i].SetBool("Shown", false);
-            }
+            StartCoroutine("ActivateRipple", false);
         }
     }
+
+    public IEnumerator ActivateRipple(bool state)
+    {
+        showing = state;
+        yield return new WaitForSeconds(delay);
+
+        for (int i = 0; i < children.Length; i++)
+        {
+            children[i].SetBool("Shown", state);
+            yield return new WaitForSeconds(delay);
+        }
+    }
+
 }
