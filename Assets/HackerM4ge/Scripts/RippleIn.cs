@@ -32,7 +32,7 @@ public class RippleIn : MonoBehaviour {
         }
         else
         {
-            if (showing) return;
+            if (!showing) return;
             showing = false;
             for (int i = 0; i < children.Length; i++)
             {
