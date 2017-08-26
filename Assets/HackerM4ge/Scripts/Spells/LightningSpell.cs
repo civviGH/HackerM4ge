@@ -78,6 +78,7 @@ public class LightningSpell : Spell
                 this.middleBeforeBending = this.lightningMitte.position;
                 spellSelectState = SpellSelectState.Bending;
             }
+            break;
         case SpellSelectState.Bending:
             Debug.Log ("Bending");
             if (leftTriggerState.up) {
