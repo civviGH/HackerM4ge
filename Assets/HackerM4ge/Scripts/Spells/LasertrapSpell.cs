@@ -7,6 +7,7 @@ class LasertrapSpell : Spell
     const float minimalDistance = 0.2f;
     const float maxSpeed = 15f;
     const float lifetime = 20f;
+    const float maxThrowDuration = 5f;
 
     private GameObject laserSourcePrefab;
     private Material laserBeamHazardMaterial;
@@ -24,6 +25,13 @@ class LasertrapSpell : Spell
     private float rightHandThrowingStartTime;
     private float leftHandThrowingStartTime;
 
+    private Vector3 rightHandThrowVelocity;
+    private Vector3 leftHandThrowVelocity;
+    private Vector3 rightHandThrowPosition;
+    private Vector3 leftHandThrowPosition;
+    private float rightHandThrowTime;
+    private float leftHandThrowTime;
+
 
 
     private enum ControllerAndTrapSourceState
@@ -32,7 +40,8 @@ class LasertrapSpell : Spell
         Placing = 1,
         Placed = 2,
         Throwing = 3,
-        Thrown = 4
+        Thrown = 4,
+        Arrived = 5
     };
 
     private ControllerAndTrapSourceState leftHandState = ControllerAndTrapSourceState.Initial;
@@ -88,14 +97,16 @@ class LasertrapSpell : Spell
         TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
     {
         UpdateControllerStateAndTrap(rightTriggerState, rightTouchpadAxis, rightControllerPosition, rightControllerDirection,
-            ref rightHandTrapSource, ref rightHandPlacedTrapSource, ref rightHandState, ref rightHandThrowingStartPosition, ref rightHandThrowingStartTime
+            ref rightHandTrapSource, ref rightHandPlacedTrapSource, ref rightHandState, ref rightHandThrowingStartPosition, ref rightHandThrowingStartTime,
+            ref rightHandThrowVelocity, ref rightHandThrowPosition, ref rightHandThrowTime
         );
         UpdateControllerStateAndTrap(leftTriggerState, leftTouchpadAxis, leftControllerPosition, leftControllerDirection,
-            ref leftHandTrapSource, ref leftHandPlacedTrapSource, ref leftHandState, ref leftHandThrowingStartPosition, ref leftHandThrowingStartTime
+            ref leftHandTrapSource, ref leftHandPlacedTrapSource, ref leftHandState, ref leftHandThrowingStartPosition, ref leftHandThrowingStartTime,
+            ref leftHandThrowVelocity, ref leftHandThrowPosition, ref leftHandThrowTime
         );
 
         // when both are placed, finish and reset
-        if (rightHandState == ControllerAndTrapSourceState.Thrown && leftHandState == ControllerAndTrapSourceState.Thrown)
+        if (rightHandState == ControllerAndTrapSourceState.Arrived && leftHandState == ControllerAndTrapSourceState.Arrived)
         {
             MakeTrapSolid(rightHandPlacedTrapSource);
             MakeTrapSolid(leftHandPlacedTrapSource);
@@ -114,7 +125,8 @@ class LasertrapSpell : Spell
     }
 
     private void UpdateControllerStateAndTrap(TriggerState triggerState, Vector2 touchpadAxis, Vector3? controllerPosition, Vector3? controllerDirection,
-        ref GameObject trapSource, ref GameObject placedTrapSource, ref ControllerAndTrapSourceState state, ref Vector3 throwingStartPosition, ref float throwingStartTime)
+        ref GameObject trapSource, ref GameObject placedTrapSource, ref ControllerAndTrapSourceState state, ref Vector3 throwingStartPosition, ref float throwingStartTime,
+        ref Vector3 throwVelocity, ref Vector3 throwPosition, ref float throwTime)
     {
         if (controllerPosition == null || controllerDirection == null)
         {
@@ -139,7 +151,7 @@ class LasertrapSpell : Spell
                     {
                         state = ControllerAndTrapSourceState.Placed;
                         placedTrapSource = trapSource;
-                        trapSource = InstantiateTrapSource();
+                        trapSource = null;
                     }
                     else
                     {
@@ -150,6 +162,8 @@ class LasertrapSpell : Spell
             case ControllerAndTrapSourceState.Placed:
                 if (triggerState.down)
                 {
+                    trapSource = InstantiateTrapSource();
+                    MakeTrapSolid(trapSource);
                     throwingStartPosition = controllerPosition.Value;
                     throwingStartTime = Time.time;
                     state = ControllerAndTrapSourceState.Throwing;
@@ -160,15 +174,58 @@ class LasertrapSpell : Spell
                 if (triggerState.up)
                 {
                     Vector3 direction = controllerPosition.Value - throwingStartPosition;
-                    float speed = direction.magnitude / (throwingStartTime - Time.time);
+                    float speed = direction.magnitude / (Time.time - throwingStartTime);
+
+                    throwVelocity = direction / (Time.time - throwingStartTime) * 10;
+                    throwPosition = controllerPosition.Value;
+                    throwTime = Time.time;
 
                     state = ControllerAndTrapSourceState.Thrown;
-                    MakeTrapSolid(trapSource);
+                    trapSource.AddComponent<Rigidbody>();
+                    trapSource.GetComponent<Rigidbody>().velocity = throwVelocity;
+                    trapSource.GetComponent<Rigidbody>().mass = 1;
                 }
                 break;
             case ControllerAndTrapSourceState.Thrown:
+                if (maxThrowDuration < Time.time - throwTime)
+                {
+                    state = ControllerAndTrapSourceState.Placed;
+                    Object.Destroy(trapSource);
+                }
+                float currentDist = (placedTrapSource.transform.position - trapSource.transform.position).magnitude;
+                float origDist = (placedTrapSource.transform.position - throwPosition).magnitude;
+
+                float velocityWeight = currentDist / origDist;
+                if (currentDist < 1)
+                {
+                    state = ControllerAndTrapSourceState.Arrived;
+                    Object.Destroy(trapSource);
+                }
+
+                if (velocityWeight > 2)
+                {
+                    state = ControllerAndTrapSourceState.Placed;
+                    Object.Destroy(trapSource);
+                }
+                if (velocityWeight > 1)
+                {
+                    velocityWeight = 1;
+                }
+                UpdateFlyingTrapSourceVelocity(ref trapSource, placedTrapSource, throwVelocity, velocityWeight);
+
                 break;
         }
+    }
+
+    private static void UpdateFlyingTrapSourceVelocity(
+        ref GameObject trapSource, GameObject placedTrapSource, Vector3 throwVelocity, float velocityWeight
+    )
+    {
+        Vector3 targetVelocity = (placedTrapSource.transform.position - trapSource.transform.position).normalized * 10;
+
+        trapSource.GetComponent<Rigidbody>().velocity
+                = velocityWeight * throwVelocity
+                + (1 - velocityWeight) * targetVelocity;
     }
 
     private void MakeTrapSolid(GameObject trapSource)
