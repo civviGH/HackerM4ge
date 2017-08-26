@@ -42,7 +42,6 @@ public class RippleIn : MonoBehaviour {
 
         for (int i = 0; i < children.Length; i++)
         {
-            Debug.Log(Time.time);
             children[i].SetBool("Shown", state);
             yield return new WaitForSeconds(delay);
         }

@@ -59,7 +59,6 @@ public class LightningSpell : Spell
             }
             break;
         case SpellSelectState.Grabbing:
-            Debug.Log ("Grabbing");
             if (rightTriggerState.press) {
                 Vector3? target = FindTarget (rightControllerPosition, rightControllerDirection);
                 if (target != null) {
@@ -73,14 +72,12 @@ public class LightningSpell : Spell
                 CancelSpell ();
             }
             if (leftTriggerState.down) {
-                Debug.Log ("LeftTriggerDown while grabbing");
                 this.bendingStartPosition = rightControllerPosition;
                 this.middleBeforeBending = this.lightningMitte.position;
                 spellSelectState = SpellSelectState.Bending;
             }
             break;
         case SpellSelectState.Bending:
-            Debug.Log ("Bending");
             if (leftTriggerState.up) {
                 spellSelectState = SpellSelectState.Grabbing;
                 break;
