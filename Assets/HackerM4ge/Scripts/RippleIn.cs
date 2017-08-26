@@ -6,7 +6,7 @@ public class RippleIn : MonoBehaviour {
 
     public float minDistance = 2;
     public bool showing;
-    public float delay = 0.1;
+    public float delay = 0.1f;
 
     protected Animator[] children;
 
@@ -37,12 +37,12 @@ public class RippleIn : MonoBehaviour {
     public IEnumerator ActivateRipple(bool state)
     {
         showing = state;
-        yield return new WaitForSeconds(delay);
+        yield return new WaitForSecondsRealtime(delay);
 
         for (int i = 0; i < children.Length; i++)
         {
             children[i].SetBool("Shown", state);
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSecondsRealtime(delay);
         }
     }
 
