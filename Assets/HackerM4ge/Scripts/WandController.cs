@@ -14,7 +14,6 @@ public class WandController : MonoBehaviour
     private GameObject highlightedPlatform;
 
     // buttons
-    private const Valve.VR.EVRButtonId triggerButton = Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger;
     private const Valve.VR.EVRButtonId gripButton = Valve.VR.EVRButtonId.k_EButton_Grip;
     private const Valve.VR.EVRButtonId menuButton = Valve.VR.EVRButtonId.k_EButton_ApplicationMenu;
     private const Valve.VR.EVRButtonId touchpad = Valve.VR.EVRButtonId.k_EButton_SteamVR_Touchpad;
@@ -27,7 +26,7 @@ public class WandController : MonoBehaviour
     // controller initalize
     // TODO This should be a method, not a property...
     private SteamVR_Controller.Device rightController { get { return SteamVR_Controller.Input((int)trackedObj.index); } }
-    private SteamVR_Controller.Device leftController { 
+    private SteamVR_Controller.Device leftController {
         get {
             var index = leftControllerObject.GetComponent<SteamVR_TrackedObject> ().index;
             if (index == SteamVR_TrackedObject.EIndex.None) {
@@ -49,7 +48,6 @@ public class WandController : MonoBehaviour
         trackedObj = GetComponent<SteamVR_TrackedObject>();
 
         controllerType = Helper.GetControllerType(rightController);
-        //Debug.Log(string.Format("{0} Controller detected", Enum.GetName(typeof(ControllerType), controllerType)));
     }
 
     private void ExecuteWandActions(TWandAction[] wandActions)
@@ -129,29 +127,19 @@ public class WandController : MonoBehaviour
             leftControllerDirection = Helper.WandDirection(leftControllerObject.transform, controllerType).normalized;
         }
 
+        ControllerBridge rightControllerBridge = new ControllerBridge(this.gameObject);
+        ControllerBridge leftControllerBridge = leftController != null ? new ControllerBridge(leftControllerObject) : null;
+
         return SelectedSpell().UpdateSpell(
-            GetTriggerState(rightController),
-            rightController.GetAxis(),
-            transform.position,
-            normalizedDirection,
-            GetTriggerState(leftController),
-            leftControllerAxis,
-            leftControllerPosition,
-            leftControllerDirection
+            rightControllerBridge.GetTriggerState(),
+            rightControllerBridge.GetTouchpadAxis(),
+            rightControllerBridge.GetPosition(),
+            rightControllerBridge.GetDirection(),
+            leftControllerBridge != null ? leftControllerBridge.GetTriggerState() : null,
+            leftControllerBridge != null ? leftControllerBridge.GetTouchpadAxis() : Vector2.zero,
+            leftControllerBridge != null ? leftControllerBridge.GetPosition() : null as Vector3?,
+            leftControllerBridge != null ? leftControllerBridge.GetDirection() : null as Vector3?
         );
     }
 
-    private static TriggerState GetTriggerState(SteamVR_Controller.Device controller)
-    {
-        if(controller == null)
-        {
-            return new TriggerState(false, false, false);
-        }
-
-        return new TriggerState(
-            controller.GetPressUp(triggerButton),
-            controller.GetPressDown(triggerButton),
-            controller.GetPress(triggerButton)
-        );
-    }
 }
