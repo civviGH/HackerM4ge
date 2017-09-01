@@ -29,9 +29,20 @@ public class ChaosSpell : Spell
         return material;
     }
 
-    TWandAction[] Spell.UpdateSpell(TriggerState rightTriggerState, Vector2 rightTouchpadAxis, Vector3 rightControllerPosition, Vector3 rightControllerDirection,
-        TriggerState leftTriggerState, Vector2 leftTouchpadAxis, Vector3? leftControllerPosition, Vector3? leftControllerDirection)
+    TWandAction[] Spell.UpdateSpell(ControllerBridge rightController, ControllerBridge leftController)
     {
+        TriggerState rightTriggerState = rightController.GetTriggerState();
+        Vector2 rightTouchpadAxis = rightController.GetTouchpadAxis();
+        Vector3 rightControllerPosition = rightController.GetPosition();
+        Vector3 rightControllerDirection = rightController.GetDirection();
+        Vector3 rightControllerVelocity = rightController.GetVelocity();
+
+        TriggerState leftTriggerState = leftController != null ? leftController.GetTriggerState() : null;
+        Vector2 leftTouchpadAxis = leftController != null ? leftController.GetTouchpadAxis() : Vector2.zero;
+        Vector3? leftControllerPosition = leftController != null ? leftController.GetPosition() : null as Vector3?;
+        Vector3? leftControllerDirection = leftController != null ? leftController.GetDirection() : null as Vector3?;
+        Vector3? leftControllerVelocity = leftController != null ? leftController.GetVelocity() : null as Vector3?;
+
         if (rightTriggerState.down)
         {
             // check if wand is visible in the camera view

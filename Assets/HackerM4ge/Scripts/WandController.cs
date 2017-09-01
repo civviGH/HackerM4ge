@@ -131,14 +131,8 @@ public class WandController : MonoBehaviour
         ControllerBridge leftControllerBridge = leftController != null ? new ControllerBridge(leftControllerObject) : null;
 
         return SelectedSpell().UpdateSpell(
-            rightControllerBridge.GetTriggerState(),
-            rightControllerBridge.GetTouchpadAxis(),
-            rightControllerBridge.GetPosition(),
-            rightControllerBridge.GetDirection(),
-            leftControllerBridge != null ? leftControllerBridge.GetTriggerState() : null,
-            leftControllerBridge != null ? leftControllerBridge.GetTouchpadAxis() : Vector2.zero,
-            leftControllerBridge != null ? leftControllerBridge.GetPosition() : null as Vector3?,
-            leftControllerBridge != null ? leftControllerBridge.GetDirection() : null as Vector3?
+            rightControllerBridge,
+            leftControllerBridge
         );
     }
 
