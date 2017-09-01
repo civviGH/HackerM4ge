@@ -8,6 +8,8 @@ class LasertrapSpell : Spell
     const float maxSpeed = 15f;
     const float lifetime = 20f;
     const float maxThrowDuration = 5f;
+    const float maxThrowDistanceFactor = 2f;
+    const float arrivalDistance = 0.1f;
 
     private GameObject laserSourcePrefab;
     private Material laserBeamHazardMaterial;
@@ -107,11 +109,11 @@ class LasertrapSpell : Spell
         Vector3? leftControllerDirection = leftController != null ? leftController.GetDirection() : null as Vector3?;
         Vector3? leftControllerVelocity = leftController != null ? leftController.GetVelocity() : null as Vector3?;
 
-        UpdateControllerStateAndTrap(rightTriggerState, rightTouchpadAxis, rightControllerPosition, rightControllerDirection,
+        UpdateControllerStateAndTrap(rightTriggerState, rightTouchpadAxis, rightControllerPosition, rightControllerDirection, rightControllerVelocity,
             ref rightHandTrapSource, ref rightHandPlacedTrapSource, ref rightHandState, ref rightHandThrowingStartPosition, ref rightHandThrowingStartTime,
             ref rightHandThrowVelocity, ref rightHandThrowPosition, ref rightHandThrowTime
         );
-        UpdateControllerStateAndTrap(leftTriggerState, leftTouchpadAxis, leftControllerPosition, leftControllerDirection,
+        UpdateControllerStateAndTrap(leftTriggerState, leftTouchpadAxis, leftControllerPosition, leftControllerDirection, leftControllerVelocity,
             ref leftHandTrapSource, ref leftHandPlacedTrapSource, ref leftHandState, ref leftHandThrowingStartPosition, ref leftHandThrowingStartTime,
             ref leftHandThrowVelocity, ref leftHandThrowPosition, ref leftHandThrowTime
         );
@@ -135,7 +137,7 @@ class LasertrapSpell : Spell
         return actions;
     }
 
-    private void UpdateControllerStateAndTrap(TriggerState triggerState, Vector2 touchpadAxis, Vector3? controllerPosition, Vector3? controllerDirection,
+    private void UpdateControllerStateAndTrap(TriggerState triggerState, Vector2 touchpadAxis, Vector3? controllerPosition, Vector3? controllerDirection, Vector3? controllerVelocity,
         ref GameObject trapSource, ref GameObject placedTrapSource, ref ControllerAndTrapSourceState state, ref Vector3 throwingStartPosition, ref float throwingStartTime,
         ref Vector3 throwVelocity, ref Vector3 throwPosition, ref float throwTime)
     {
@@ -184,10 +186,9 @@ class LasertrapSpell : Spell
                 UpdateTrapSourcePosition(ref trapSource, controllerPosition.Value, controllerDirection.Value, false);
                 if (triggerState.up)
                 {
-                    Vector3 direction = controllerPosition.Value - throwingStartPosition;
-                    float speed = direction.magnitude / (Time.time - throwingStartTime);
-
-                    throwVelocity = direction / (Time.time - throwingStartTime) * 10;
+                    //Vector3 direction = controllerPosition.Value - throwingStartPosition;
+                    //throwVelocity = direction / (Time.time - throwingStartTime) * 10;
+                    throwVelocity = controllerVelocity.Value;
                     throwPosition = controllerPosition.Value;
                     throwTime = Time.time;
 
@@ -198,31 +199,36 @@ class LasertrapSpell : Spell
                 }
                 break;
             case ControllerAndTrapSourceState.Thrown:
+                float currentDist = (placedTrapSource.transform.position - trapSource.transform.position).magnitude;
+                float origDist = (placedTrapSource.transform.position - throwPosition).magnitude;
+                float velocityWeight = currentDist / origDist;
                 if (maxThrowDuration < Time.time - throwTime)
                 {
+                    // Throw took too long
                     state = ControllerAndTrapSourceState.Placed;
                     Object.Destroy(trapSource);
                 }
-                float currentDist = (placedTrapSource.transform.position - trapSource.transform.position).magnitude;
-                float origDist = (placedTrapSource.transform.position - throwPosition).magnitude;
-
-                float velocityWeight = currentDist / origDist;
-                if (currentDist < 1)
+                else if (velocityWeight > maxThrowDistanceFactor)
                 {
+                    // Thrown too far in the wrong direction
+                    state = ControllerAndTrapSourceState.Placed;
+                    Object.Destroy(trapSource);
+                    break;
+                }
+                else if (currentDist < arrivalDistance)
+                {
+                    // Hit the target
                     state = ControllerAndTrapSourceState.Arrived;
                     Object.Destroy(trapSource);
                 }
-
-                if (velocityWeight > 2)
+                else
                 {
-                    state = ControllerAndTrapSourceState.Placed;
-                    Object.Destroy(trapSource);
+                    if (velocityWeight > 1)
+                    {
+                        velocityWeight = 1;
+                    }
+                    UpdateFlyingTrapSourceVelocity(ref trapSource, placedTrapSource, throwVelocity, velocityWeight);
                 }
-                if (velocityWeight > 1)
-                {
-                    velocityWeight = 1;
-                }
-                UpdateFlyingTrapSourceVelocity(ref trapSource, placedTrapSource, throwVelocity, velocityWeight);
 
                 break;
         }
